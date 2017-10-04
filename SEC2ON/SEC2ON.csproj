@@ -146,6 +146,12 @@
     <Compile Include="Dialogs\LBSecconBusinessLogic.Dialogs.PWGen.Designer.cs">
       <DependentUpon>LBSecconBusinessLogic.Dialogs.PWGen.cs</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\LBSecconBusinessLogic.Dialogs.AboutDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\LBSecconBusinessLogic.Dialogs.AboutDlg.Designer.cs">
+      <DependentUpon>LBSecconBusinessLogic.Dialogs.AboutDlg.cs</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\SECCON.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -172,6 +178,9 @@
     <EmbeddedResource Include="Dialogs\LBSecconBusinessLogic.Dialogs.PWGen.resx">
       <DependentUpon>LBSecconBusinessLogic.Dialogs.PWGen.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\LBSecconBusinessLogic.Dialogs.AboutDlg.resx">
+      <DependentUpon>LBSecconBusinessLogic.Dialogs.AboutDlg.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\SECCON.resx">
       <DependentUpon>SECCON.cs</DependentUpon>
     </EmbeddedResource>
@@ -196,10 +205,14 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Content Include="License.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Include="padlock-3-64_gelb.ico" />
     <Content Include="Src\BouncyCastle.Crypto.dll" />
+    <Content Include="Src\icos Program\el-mejor.png" />
     <Content Include="Src\icos Program\error-5-16_bold.ico" />
     <Content Include="Src\icos Program\error-6-16.ico" />
     <Content Include="Src\icos Program\info-16_bold.ico" />

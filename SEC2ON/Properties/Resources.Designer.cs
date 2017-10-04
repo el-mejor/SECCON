@@ -61,6 +61,16 @@ namespace SEC2ON.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap el_mejor {
+            get {
+                object obj = ResourceManager.GetObject("el-mejor", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to .sdb_backup.
         /// </summary>
         internal static string ExtensionBackup {

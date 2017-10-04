@@ -1683,16 +1683,21 @@ namespace SEC2ON
                 toolStripProgressBar1.Value = secconbl.Killclipboardtimerexpired;
             }
         }
+
+
+
+
+
+
+
+
+
         #endregion
 
-        
-
-
-
-        
-
-
-
-
+        private void toolStripButton4_Click(object sender, EventArgs e)
+        {
+            AboutDlg about = new AboutDlg();
+            about.ShowDialog();
+        }
     }
 }
