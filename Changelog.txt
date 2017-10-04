@@ -61,5 +61,7 @@ V1.4.3.0 (dev. 1.4.2.0)
 V1.4.5.0 (dev. 1.4.4.0)
 * FIXED - Crash when entering characters that are not listed.
 
-* check for file associations on startup?
+V1.4.7.0 (dev. 1.4.6.0)
+from now, changes are tracked in github milestones / issues
+
 
