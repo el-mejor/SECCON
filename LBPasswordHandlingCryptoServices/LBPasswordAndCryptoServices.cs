@@ -1,17 +1,11 @@
-﻿using System;
-using System.Data;
-using System.Text;
-using System.Security.Cryptography;
-using System.Windows.Forms;
-using System.Security;
-using System.IO;
-using System.Collections;
-
+﻿using Org.BouncyCastle.Bcpg;
 using Org.BouncyCastle.Bcpg.OpenPgp;
 using Org.BouncyCastle.Security;
-using Org.BouncyCastle.Utilities.IO;
-using Org.BouncyCastle.Utilities.Encoders;
-using Org.BouncyCastle.Bcpg;
+using System;
+using System.IO;
+using System.Security.Cryptography;
+using System.Text;
+using System.Windows.Forms;
 
 namespace LBPasswordAndCryptoServices
 {

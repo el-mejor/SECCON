@@ -1,23 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
-using System.Security.Cryptography;
-using System.Security;
-using System.IO;
-using System.Xml;
-using System.Collections;
-
-using DropNet;
+﻿using DropNet;
+using LBPasswordAndCryptoServices;
 using SEC2ON.LBSecconBusinessLogic.Classes;
 using SEC2ON.LBSecconBusinessLogic.Dialogs;
-using SEC2ON.LBSecconBusinessLogic.Dialogs.Controlls;
-
-using LBPasswordAndCryptoServices;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Windows.Forms;
+using System.Xml;
 
 namespace SEC2ON.LBSecconBusinessLogic
 {

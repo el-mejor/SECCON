@@ -1,18 +1,9 @@
-﻿using System;
+﻿using LBPasswordAndCryptoServices;
+using SEC2ON.LBSecconBusinessLogic.Classes;
+using System;
 using System.Collections.Generic;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using System.Xml;
-using System.Security.Cryptography;
-
-using SEC2ON.LBSecconBusinessLogic;
-using SEC2ON.LBSecconBusinessLogic.Classes;
-using LBPasswordAndCryptoServices;
 
 namespace SEC2ON.LBSecconBusinessLogic.Dialogs
 {

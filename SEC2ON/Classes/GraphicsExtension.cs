@@ -24,7 +24,7 @@ using System.Runtime.InteropServices;
 
 namespace Plasmoid.Extensions
 {
-	static class GraphicsExtension
+    static class GraphicsExtension
 	{
 		private static GraphicsPath GenerateRoundedRectangle(
 				this Graphics graphics,

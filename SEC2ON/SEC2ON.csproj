@@ -196,7 +196,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="SEC2ON_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="padlock-3-64_gelb.ico" />

@@ -1,20 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Org.BouncyCastle.Bcpg.OpenPgp;
+using System;
 using System.Collections;
-using System.ComponentModel;
-using System.Data;
+using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
+using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml;
-using System.IO;
-
-using Org.BouncyCastle.Bcpg.OpenPgp;
-using Org.BouncyCastle.Security;
-using Org.BouncyCastle.Utilities.IO;
-using Org.BouncyCastle.Utilities.Encoders;
-using Org.BouncyCastle.Bcpg;
 
 namespace SEC2ON.LBSecconBusinessLogic.Dialogs
 {

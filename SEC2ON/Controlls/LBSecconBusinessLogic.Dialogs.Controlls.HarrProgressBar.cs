@@ -8,16 +8,11 @@
  * ------------------------
  * 1.0.0.0 (20 Jul 2009): Initial release.
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
-using System.Drawing;
 using Plasmoid.Extensions;
+using System;
+using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Diagnostics;
-using System.ComponentModel;
+using System.Windows.Forms;
 
 namespace SEC2ON.LBSecconBusinessLogic.Dialogs.Controlls
 {
