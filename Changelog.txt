@@ -1,0 +1,65 @@
+V1.3.1.0: (dev V1.3.0.0)
+* internal changes, refactoring, minor changes
+* no secret infromation will be compromised into memory (e.g. dump) except when importing items or copy/paste items
+* Password handler and cryptographic services are outsourced into a seperate dll
+* .net framework 4.5 is used now
+* Import of items (only when exported (AES-) encrypted by SECCON before)
+* Copy/Paste of items within same database and into another database
+* deleting of multiple items at once
+* Sorting corrected (deleted items without lastmodified information lead to faulty sorting)
+* Sorting provides both ascending and descending sorting now
+
+V1.3.3.0: (dev V1.3.2.0)
+* Bugfix: En- and decrypt files was not possible since V1.3.1.0
+* New explanation scale for password age
+* If a session pin is set it is shown in the status bar and the lock button changes to yellow to indicate that there's only a weak protection
+* Inspector Frame with tabs
+* New Tab "Log" for all messages. List of merge results after synchronizing with another DB
+* Entry context menu is disabled when no database is opened
+* Cancelling the PIN dialog will lead to master key dialog
+* Prevent from multiple pin/master key dialogs when selection is changing
+* Enabling and disabling context menu entries depending to program state (locked / unlocken, ammount of selected items). 
+
+V1.3.5.0: (dev V1.3.4.0)
+* don't log if a deleted item was synchronized
+* When the master key is changed all deleted entrys are removed (=maintenance, since the target (dropbox) db will be overwritten 
+	by the local instance and all other local db master keys are going to changed as well)
+
+V1.4.1.0: (dev V1.3.6.0 / V1.4.0.0)
+* Fixed: Clipboard keeps password stored when Seccon is closed while 10sec to delete clipboard are running.
+* Progressbar until password is deleted from clipboard
+* When the database is locked the form is reduzed to the taskbar. When re-minimizing the form the database must be unlocked before.
+* Fixed: Crash when a entry is going to be added when the database is locked
+* Fixed: Crash when copying empty UN/PW to clipboard
+* Secondary toolstrip to add, edit, delete, copy PW, copy UN and browse URL below listview.
+* Fixed: When replacing the target DB in the dropbox it will be replaced twice so that the previous one (with the old PW) is lost.
+* Fixed: If there are unsaved changes and the DB was saved in a new file it was claiming that there's are unsaved changed before the new database was opened.
+* Set an expiration date, show expired items in extra group / red highlighted
+* Password generator checks the entered password if the criterias are fullfilled
+* Automatic password generatrion always generates a password which fullfills the given password criterias.
+* Minor changes in logging
+* Password generator is now known as password wizard.
+* Set of signs changed which are used in the password wizard (removed some incompatible signs which may lead to problems).
+* Fixed: Window keeps disabled when file encryption is cancelled.
+* Fixed: Window keeps disabled when file decryption pw dialog is cancelled.
+
+V1.4.3.0 (dev. 1.4.2.0)
+* FIXED: When copying or importing the notes of an item got lost.
+* Groups can be added, deleted, edited and moved.
+* Some changes in UI design
+* Paste item into the selected group (overwrites original group) except a generic group is selected
+* Add item into the selected group except a generic group is selected
+* Started to separate BL from GUI.
+* Own class for database items
+* PWHandler timeout will be extended when changes are made to the editentry form (preventing locking while editentry form is open)
+* FIXED: Bug when encrypting a file without an opened database.
+* FIXED: Starting some instances of seccon at the same time may lead to selftest errors since all instances are using the same selftest file. Solved by giving the process id as suffix
+* FIXED: Seccon thought that a database is opened when the password dialog of the open process was cancelled
+* FIXED: Ecnrypting more than one file without an opened database was not possible. Only the first one was compiled
+* Check Names and URLs in the Add/Edit dialogs
+
+V1.4.5.0 (dev. 1.4.4.0)
+* FIXED - Crash when entering characters that are not listed.
+
+* check for file associations on startup?
+

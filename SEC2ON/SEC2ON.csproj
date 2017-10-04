@@ -1,0 +1,303 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{136C48BB-9E50-4163-B3A2-DA141D7C35C6}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SEC2ON</RootNamespace>
+    <AssemblyName>SEC2ON</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>false</MapFileExtensions>
+    <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.3.3.0</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <CreateDesktopShortcut>true</CreateDesktopShortcut>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Src\key-64.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>3A719F1AF54117F5D1FF069B23B21E5ED00D94AF</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>SEC2ON_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>false</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>true</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetZone>LocalIntranet</TargetZone>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="BouncyCastle.Crypto, Version=1.7.4114.6375, Culture=neutral, PublicKeyToken=0e99375e54769942">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Src\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
+    <Reference Include="DropNet">
+      <HintPath>.\DropNet.dll</HintPath>
+    </Reference>
+    <Reference Include="LBPasswordAndCryptoServices, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Release\LBPasswordAndCryptoServices.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.QualityTools.Testing.Fakes, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="RestSharp">
+      <HintPath>..\..\dropnet\DropNet-master\packages\RestSharp.104.1\lib\net4\RestSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Classes\LBSecconBusinessLogic.Classes.cs" />
+    <Compile Include="Classes\LBSecconBusinessLogic.cs" />
+    <Compile Include="Controlls\LBSecconBusinessLogic.Dialogs.Controlls.dayscale.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controlls\LBSecconBusinessLogic.Dialogs.Controlls.dayscale.Designer.cs">
+      <DependentUpon>LBSecconBusinessLogic.Dialogs.Controlls.dayscale.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\LBSecconBusinessLogic.Dialogs.SelectOnlineDB.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\LBSecconBusinessLogic.Dialogs.SelectOnlineDB.Designer.cs">
+      <DependentUpon>LBSecconBusinessLogic.Dialogs.SelectOnlineDB.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\LBSecconBusinessLogic.Dialogs.enterpassword.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\LBSecconBusinessLogic.Dialogs.enterpassword.Designer.cs">
+      <DependentUpon>LBSecconBusinessLogic.Dialogs.enterpassword.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\LBSecconBusinessLogic.Dialogs.editentry.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\LBSecconBusinessLogic.Dialogs.editentry.Designer.cs">
+      <DependentUpon>LBSecconBusinessLogic.Dialogs.editentry.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\GraphicsExtension.cs" />
+    <Compile Include="Controlls\LBSecconBusinessLogic.Dialogs.Controlls.HarrProgressBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Dialogs\LBSecconBusinessLogic.Dialogs.ManageKeys.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\LBSecconBusinessLogic.Dialogs.ManageKeys.Designer.cs">
+      <DependentUpon>LBSecconBusinessLogic.Dialogs.ManageKeys.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\LBSecconBusinessLogic.Dialogs.PWGen.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\LBSecconBusinessLogic.Dialogs.PWGen.Designer.cs">
+      <DependentUpon>LBSecconBusinessLogic.Dialogs.PWGen.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\SECCON.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\SECCON.Designer.cs">
+      <DependentUpon>SECCON.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Controlls\LBSecconBusinessLogic.Dialogs.Controlls.dayscale.resx">
+      <DependentUpon>LBSecconBusinessLogic.Dialogs.Controlls.dayscale.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\LBSecconBusinessLogic.Dialogs.SelectOnlineDB.resx">
+      <DependentUpon>LBSecconBusinessLogic.Dialogs.SelectOnlineDB.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\LBSecconBusinessLogic.Dialogs.enterpassword.resx">
+      <DependentUpon>LBSecconBusinessLogic.Dialogs.enterpassword.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\LBSecconBusinessLogic.Dialogs.editentry.resx">
+      <DependentUpon>LBSecconBusinessLogic.Dialogs.editentry.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\LBSecconBusinessLogic.Dialogs.ManageKeys.resx">
+      <DependentUpon>LBSecconBusinessLogic.Dialogs.ManageKeys.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\LBSecconBusinessLogic.Dialogs.PWGen.resx">
+      <DependentUpon>LBSecconBusinessLogic.Dialogs.PWGen.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\SECCON.resx">
+      <DependentUpon>SECCON.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="app.config" />
+    <None Include="Properties\app.manifest" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <None Include="SEC2ON_TemporaryKey.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="padlock-3-64_gelb.ico" />
+    <Content Include="Src\BouncyCastle.Crypto.dll" />
+    <Content Include="Src\icos Program\error-5-16_bold.ico" />
+    <Content Include="Src\icos Program\error-6-16.ico" />
+    <Content Include="Src\icos Program\info-16_bold.ico" />
+    <Content Include="Src\icos Program\info-2-16.ico" />
+    <Content Include="Src\icos Program\key-16_green.ico" />
+    <Content Include="Src\icos Program\key-16_red.ico" />
+    <Content Include="Src\icos Program\key-64_red.ico" />
+    <Content Include="Src\icos Program\save-16_gr.ico" />
+    <Content Include="Src\icos Program\sinchronize-16.ico" />
+    <Content Include="Src\icos Program\warning-16_bold.ico" />
+    <Content Include="Src\icos Program\warning-6-16.ico" />
+    <Content Include="Src\icos Groups\banknotes-64.ico" />
+    <Content Include="Src\icos Groups\contacts-64.ico" />
+    <Content Include="Src\icos Groups\data-encryption-64.ico" />
+    <Content Include="Src\icos Groups\downloads-64.ico" />
+    <Content Include="Src\icos Groups\euro-64.ico" />
+    <Content Include="Src\icos Groups\folder-3-64.ico" />
+    <Content Include="Src\icos Groups\globe-2-64.ico" />
+    <Content Include="Src\icos Groups\key-64.ico" />
+    <Content Include="Src\icos Groups\login-64.ico" />
+    <Content Include="Src\icos Groups\phone-3-64.ico" />
+    <Content Include="Src\icos Groups\search-3-64.ico" />
+    <Content Include="Src\icos Groups\shop-64.ico" />
+    <Content Include="Src\icos Groups\user-64.ico" />
+    <Content Include="Src\icos Groups\wireless-64.ico" />
+    <Content Include="Src\icos Program\add-list-64.ico" />
+    <Content Include="Src\icos Program\arrow-104-16.ico" />
+    <Content Include="Src\icos Program\arrow-108-16.ico" />
+    <Content Include="Src\icos Program\arrow-39-16.ico" />
+    <Content Include="Src\icos Program\arrow-42-16.ico" />
+    <Content Include="Src\icos Program\blank-file-64.ico" />
+    <Content Include="Src\icos Program\check-mark-5-64.ico" />
+    <Content Include="Src\icos Program\clipboard-8-64.ico" />
+    <Content Include="Src\icos Program\close-window-16.ico" />
+    <Content Include="Src\icos Program\close-window-64.ico" />
+    <Content Include="Src\icos Program\data-encryption-16_gr.ico" />
+    <Content Include="Src\icos Program\data-encryption-16_rd.ico" />
+    <Content Include="Src\icos Program\data-encryption-16_yl.ico" />
+    <Content Include="Src\icos Program\data-encryption-64_gre.ico" />
+    <Content Include="Src\icos Program\data-encryption-64_red.ico" />
+    <Content Include="Src\icos Program\data-encryption-64_yel.ico" />
+    <Content Include="Src\icos Program\delete-property-64.ico" />
+    <Content Include="Src\icos Program\dropbox-16.ico" />
+    <Content Include="Src\icos Program\edit-property-64.ico" />
+    <Content Include="Src\icos Program\folder-3-16.ico" />
+    <Content Include="Src\icos Program\folder-3-16_bl.ico" />
+    <Content Include="Src\icos Program\key-64.ico" />
+    <Content Include="Src\icos Program\open-in-browser-64.ico" />
+    <Content Include="Src\icos Program\padlock-3-64.ico" />
+    <Content Include="Src\icos Program\padlock-4-64.ico" />
+    <Content Include="Src\icos Program\save-16.ico" />
+    <Content Include="Src\icos Program\save-64.ico" />
+    <Content Include="Src\icos Program\save-as-16.ico" />
+    <Content Include="Src\icos Program\save-as-64.ico" />
+    <Content Include="Src\icos Program\search-3-16.ico" />
+    <Content Include="Src\key-64.ico" />
+    <Content Include="Src\DropNet.dll" />
+    <Content Include="Src\RestSharp.dll" />
+    <Content Include="Src\RestSharp.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.5">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.5 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <FileAssociation Include=".sdb">
+      <Visible>False</Visible>
+      <Description>Seccon Database</Description>
+      <Progid>seccon</Progid>
+      <DefaultIcon>Src\key-64.ico</DefaultIcon>
+    </FileAssociation>
+    <FileAssociation Include=".sef">
+      <Visible>False</Visible>
+      <Description>Seccon Encrypted File</Description>
+      <Progid>seccon</Progid>
+      <DefaultIcon>Src\key-64.ico</DefaultIcon>
+    </FileAssociation>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
