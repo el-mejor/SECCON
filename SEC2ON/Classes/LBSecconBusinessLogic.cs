@@ -1911,7 +1911,7 @@ namespace SEC2ON.LBSecconBusinessLogic
             List<OnlineDatabase> onlineDBs = new List<OnlineDatabase>();
             try
             {
-                DropNetClient db = new DropNetClient(Properties.Resources.dropboxAppKey, Properties.Resources.dropboxAppSecret);
+                DropNetClient db = new DropNetClient(Properties.Settings.Default.dropboxAppKey, Properties.Settings.Default.dropboxAppSecret);
                 db.UserLogin = dbuserlogin;
                 db.UseSandbox = true;
 
@@ -1987,7 +1987,7 @@ namespace SEC2ON.LBSecconBusinessLogic
             Application.DoEvents();
 
             //precondition: check if there's a version of the database on the dropbox, if not just copy it there
-            DropNetClient db = new DropNetClient(Properties.Resources.dropboxAppKey, Properties.Resources.dropboxAppSecret);
+            DropNetClient db = new DropNetClient(Properties.Settings.Default.dropboxAppKey, Properties.Settings.Default.dropboxAppSecret);
             db.UserLogin = dbuserlogin;
             db.UseSandbox = true;
 
@@ -2084,7 +2084,7 @@ namespace SEC2ON.LBSecconBusinessLogic
         {
             try
             {
-                DropNetClient db = new DropNetClient(Properties.Resources.dropboxAppKey, Properties.Resources.dropboxAppSecret);
+                DropNetClient db = new DropNetClient(Properties.Settings.Default.dropboxAppKey, Properties.Settings.Default.dropboxAppSecret);
                 db.UserLogin = dbuserlogin;
                 db.UseSandbox = true;
 
@@ -2258,7 +2258,7 @@ namespace SEC2ON.LBSecconBusinessLogic
             {
                 try
                 {
-                    DropNetClient db = new DropNetClient(Properties.Resources.dropboxAppKey, Properties.Resources.dropboxAppSecret);
+                    DropNetClient db = new DropNetClient(Properties.Settings.Default.dropboxAppKey, Properties.Settings.Default.dropboxAppSecret);
 
                     //1. Get request token
                     db.GetToken();

@@ -117,12 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="dropboxAppKey" xml:space="preserve">
-    <value>j93h8yfahdiudog</value>
-  </data>
-  <data name="dropboxAppSecret" xml:space="preserve">
-    <value>92f0rcs8ynwu4cm</value>
-  </data>
   <data name="TempDBFile" xml:space="preserve">
     <value>~synctemp.tmp</value>
   </data>
