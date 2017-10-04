@@ -80,14 +80,18 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Src\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
-    <Reference Include="DropNet">
-      <HintPath>.\DropNet.dll</HintPath>
+    <Reference Include="Dropbox.Api, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Src\Dropbox.Api.dll</HintPath>
     </Reference>
     <Reference Include="LBPasswordAndCryptoServices, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Release\LBPasswordAndCryptoServices.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.QualityTools.Testing.Fakes, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Src\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="RestSharp">
       <HintPath>..\..\dropnet\DropNet-master\packages\RestSharp.104.1\lib\net4\RestSharp.dll</HintPath>
     </Reference>
@@ -212,6 +216,8 @@
   <ItemGroup>
     <Content Include="padlock-3-64_gelb.ico" />
     <Content Include="Src\BouncyCastle.Crypto.dll" />
+    <Content Include="Src\Dropbox.Api.dll" />
+    <Content Include="Src\Dropbox.Api.XML" />
     <Content Include="Src\icos Program\el-mejor.png" />
     <Content Include="Src\icos Program\error-5-16_bold.ico" />
     <Content Include="Src\icos Program\error-6-16.ico" />
@@ -270,6 +276,8 @@
     <Content Include="Src\icos Program\search-3-16.ico" />
     <Content Include="Src\key-64.ico" />
     <Content Include="Src\DropNet.dll" />
+    <Content Include="Src\Newtonsoft.Json.dll" />
+    <Content Include="Src\Newtonsoft.Json.xml" />
     <Content Include="Src\RestSharp.dll" />
     <Content Include="Src\RestSharp.xml" />
   </ItemGroup>
