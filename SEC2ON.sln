@@ -18,6 +18,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dev", "Dev", "{200EB8D1-7B8
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projects", "Projects", "{0123797B-C573-420B-9F14-296CAF44A9D6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Release", "_Release", "{9297C9BE-0A12-4618-83AD-0714CF36A657}"
+	ProjectSection(SolutionItems) = preProject
+		SEC2ON\bin\Release\BouncyCastle.Crypto.dll = SEC2ON\bin\Release\BouncyCastle.Crypto.dll
+		SEC2ON\bin\Release\DropNet.dll = SEC2ON\bin\Release\DropNet.dll
+		SEC2ON\bin\Release\LBPasswordAndCryptoServices.dll = SEC2ON\bin\Release\LBPasswordAndCryptoServices.dll
+		SEC2ON\bin\Release\LBPasswordAndCryptoServices.pdb = SEC2ON\bin\Release\LBPasswordAndCryptoServices.pdb
+		SEC2ON\bin\Release\RestSharp.dll = SEC2ON\bin\Release\RestSharp.dll
+		SEC2ON\bin\Release\RestSharp.xml = SEC2ON\bin\Release\RestSharp.xml
+		SEC2ON\bin\Release\SEC2ON.exe = SEC2ON\bin\Release\SEC2ON.exe
+		SEC2ON\bin\Release\SEC2ON.exe.config = SEC2ON\bin\Release\SEC2ON.exe.config
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
