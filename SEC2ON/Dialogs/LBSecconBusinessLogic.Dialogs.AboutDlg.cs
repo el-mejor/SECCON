@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 using System.Windows.Forms;
 using System.Reflection;
@@ -23,7 +16,7 @@ namespace SEC2ON.LBSecconBusinessLogic.Dialogs
             if (Assembly.GetEntryAssembly().GetName().Version.Revision > 0)
                 labelVersion.Text += $"-beta{Assembly.GetEntryAssembly().GetName().Version.Revision}";
 
-            using (StreamReader s = new StreamReader("License.md"))
+            using (StreamReader s = new StreamReader("Src\\License.md"))
             {
                 while(!s.EndOfStream)
                     textBoxLicense.Text += s.ReadLine() + Environment.NewLine;

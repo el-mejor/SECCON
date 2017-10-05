@@ -55,7 +55,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Src\key-64.ico</ApplicationIcon>
+    <ApplicationIcon>Src\3rdParty\key-64.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestCertificateThumbprint>3A719F1AF54117F5D1FF069B23B21E5ED00D94AF</ManifestCertificateThumbprint>
@@ -75,6 +75,9 @@
   <PropertyGroup>
     <TargetZone>LocalIntranet</TargetZone>
   </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="BouncyCastle.Crypto, Version=1.7.4114.6375, Culture=neutral, PublicKeyToken=0e99375e54769942">
       <SpecificVersion>False</SpecificVersion>
@@ -83,6 +86,10 @@
     <Reference Include="Dropbox.Api, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Src\Dropbox.Api.dll</HintPath>
+    </Reference>
+    <Reference Include="DropNet, Version=1.8.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Src\3rdParty\DropNet.dll</HintPath>
     </Reference>
     <Reference Include="LBPasswordAndCryptoServices, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -209,15 +216,15 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Content Include="License.md">
+    <Content Include="Src\License.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Include="padlock-3-64_gelb.ico" />
-    <Content Include="Src\BouncyCastle.Crypto.dll" />
-    <Content Include="Src\Dropbox.Api.dll" />
-    <Content Include="Src\Dropbox.Api.XML" />
+    <Content Include="Src\3rdParty\BouncyCastle.Crypto.dll" />
+    <Content Include="Src\3rdParty\Dropbox.Api.dll" />
+    <Content Include="Src\3rdParty\Dropbox.Api.XML" />
     <Content Include="Src\icos Program\el-mejor.png" />
     <Content Include="Src\icos Program\error-5-16_bold.ico" />
     <Content Include="Src\icos Program\error-6-16.ico" />
@@ -274,12 +281,12 @@
     <Content Include="Src\icos Program\save-as-16.ico" />
     <Content Include="Src\icos Program\save-as-64.ico" />
     <Content Include="Src\icos Program\search-3-16.ico" />
-    <Content Include="Src\key-64.ico" />
-    <Content Include="Src\DropNet.dll" />
-    <Content Include="Src\Newtonsoft.Json.dll" />
-    <Content Include="Src\Newtonsoft.Json.xml" />
-    <Content Include="Src\RestSharp.dll" />
-    <Content Include="Src\RestSharp.xml" />
+    <Content Include="Src\3rdParty\key-64.ico" />
+    <Content Include="Src\3rdParty\DropNet.dll" />
+    <Content Include="Src\3rdParty\Newtonsoft.Json.dll" />
+    <Content Include="Src\3rdParty\Newtonsoft.Json.xml" />
+    <Content Include="Src\3rdParty\RestSharp.dll" />
+    <Content Include="Src\3rdParty\RestSharp.xml" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">
@@ -313,6 +320,10 @@
     </FileAssociation>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

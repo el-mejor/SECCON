@@ -1,4 +1,7 @@
 ﻿using DropNet;
+using Dropbox.Api;
+using Dropbox.Api.Files;
+using Dropbox.Api.Team;
 using LBPasswordAndCryptoServices;
 using SEC2ON.LBSecconBusinessLogic.Classes;
 using SEC2ON.LBSecconBusinessLogic.Dialogs;
@@ -2258,33 +2261,43 @@ namespace SEC2ON.LBSecconBusinessLogic
             {
                 try
                 {
-                    DropNetClient db = new DropNetClient(Properties.Settings.Default.dropboxAppKey, Properties.Settings.Default.dropboxAppSecret);
+                    //throw new NotImplementedException();
 
-                    //1. Get request token
-                    db.GetToken();
+                    //DropNetClient db = new DropNetClient(Properties.Settings.Default.dropboxAppKey, Properties.Settings.Default.dropboxAppSecret);
 
-                    //2. Authorize App with Dropbo
-                    var url = db.BuildAuthorizeUrl();
-                    System.Diagnostics.Process.Start(url);
+                    ////1. Get request token
+                    //db.GetToken();
 
-                    //2.5 if the user completes his authentification proceed
+                    ////2. Authorize App with Dropbo
+                    //var url = db.BuildAuthorizeUrl();
+                    //System.Diagnostics.Process.Start(url);
+                    var oauth2State = Guid.NewGuid().ToString("N");
+                    var authorizeUri = DropboxOAuth2Helper.GetAuthorizeUri(OAuthResponseType.Token, Properties.Settings.Default.dropboxAppKey, new Uri("https://localhost/authorize"), state: oauth2State);
+                    System.Diagnostics.Process.Start(authorizeUri.ToString());
+
+                    ////2.5 if the user completes his authentification proceed
                     DialogResult authdiag = MessageBox.Show("Click \"Ok\" if you complete your dropbox authentification.", "Dropbox authentification needed...", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
                     if (authdiag == DialogResult.Cancel) return false;
 
-                    //3. Get an Access Token from the Request Token
-                    var accessToken = db.GetAccessToken();
+                    ////3. Get an Access Token from the Request Token
+                    //var accessToken = db.GetAccessToken();
 
-                    dbuserlogin = accessToken;
+                    //dbuserlogin = accessToken;
 
-                    this.dropboxStoreLogin(dbuserlogin);
+                    //this.dropboxStoreLogin(dbuserlogin);
 
-                    db.UserLogin = new DropNet.Models.UserLogin { Token = accessToken.Token, Secret = accessToken.Secret };
+                    //db.UserLogin = new DropNet.Models.UserLogin { Token = accessToken.Token, Secret = accessToken.Secret };
 
-                    authsucceed = true;
+                    //authsucceed = true;
                 }
                 catch (DropNet.Exceptions.DropboxException ex)
                 {
                     GUI.updateLog(4, string.Format("There was an error while login to your dropbox: {0}", ex.Response.StatusDescription));
+                    return false;
+                }
+                catch (Exception ex)
+                {
+                    GUI.updateLog(4, string.Format("There was an fatal error while login to your dropbox: {0}", ex.Message));
                     return false;
                 }
             }
@@ -2302,9 +2315,7 @@ namespace SEC2ON.LBSecconBusinessLogic
                     byte[] enctoken = ProtectedData.Protect(token, null, DataProtectionScope.CurrentUser);
                     byte[] secret = Encoding.UTF8.GetBytes(userlogin.Secret);
                     byte[] encsecret = ProtectedData.Protect(secret, null, DataProtectionScope.CurrentUser);
-                    token = null;
-                    secret = null;
-
+                    
                     dbfile.WriteLine(Convert.ToBase64String(enctoken));
                     dbfile.WriteLine(Convert.ToBase64String(encsecret));
                 }
