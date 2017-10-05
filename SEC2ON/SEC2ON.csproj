@@ -78,18 +78,32 @@
   <PropertyGroup>
     <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="BouncyCastle.Crypto, Version=1.7.4114.6375, Culture=neutral, PublicKeyToken=0e99375e54769942">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Src\BouncyCastle.Crypto.dll</HintPath>
+      <HintPath>..\LBPasswordHandlingCryptoServices\Src\3rdParty\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
     <Reference Include="Dropbox.Api, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Src\Dropbox.Api.dll</HintPath>
-    </Reference>
-    <Reference Include="DropNet, Version=1.8.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Src\3rdParty\DropNet.dll</HintPath>
     </Reference>
     <Reference Include="LBPasswordAndCryptoServices, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -99,12 +113,15 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Src\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="RestSharp">
-      <HintPath>..\..\dropnet\DropNet-master\packages\RestSharp.104.1\lib\net4\RestSharp.dll</HintPath>
-    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.WebRequest" />
     <Reference Include="System.Security" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -113,6 +130,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\LBSecconBusinessLogic.Classes.cs" />
@@ -169,6 +187,7 @@
     <Compile Include="Dialogs\SECCON.Designer.cs">
       <DependentUpon>SECCON.cs</DependentUpon>
     </Compile>
+    <Compile Include="Dropbox\LBSecconBusinessLogic.Dialogs.LoginForm.xaml.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Controlls\LBSecconBusinessLogic.Dialogs.Controlls.dayscale.resx">
@@ -222,7 +241,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="padlock-3-64_gelb.ico" />
-    <Content Include="Src\3rdParty\BouncyCastle.Crypto.dll" />
     <Content Include="Src\3rdParty\Dropbox.Api.dll" />
     <Content Include="Src\3rdParty\Dropbox.Api.XML" />
     <Content Include="Src\icos Program\el-mejor.png" />
@@ -282,11 +300,8 @@
     <Content Include="Src\icos Program\save-as-64.ico" />
     <Content Include="Src\icos Program\search-3-16.ico" />
     <Content Include="Src\3rdParty\key-64.ico" />
-    <Content Include="Src\3rdParty\DropNet.dll" />
     <Content Include="Src\3rdParty\Newtonsoft.Json.dll" />
     <Content Include="Src\3rdParty\Newtonsoft.Json.xml" />
-    <Content Include="Src\3rdParty\RestSharp.dll" />
-    <Content Include="Src\3rdParty\RestSharp.xml" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">
@@ -318,6 +333,12 @@
       <Progid>seccon</Progid>
       <DefaultIcon>Src\key-64.ico</DefaultIcon>
     </FileAssociation>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Dropbox\LBSecconBusinessLogic.Dialogs.LoginForm.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

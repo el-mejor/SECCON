@@ -1,7 +1,5 @@
-﻿using DropNet;
-using Dropbox.Api;
+﻿using Dropbox.Api;
 using Dropbox.Api.Files;
-using Dropbox.Api.Team;
 using LBPasswordAndCryptoServices;
 using SEC2ON.LBSecconBusinessLogic.Classes;
 using SEC2ON.LBSecconBusinessLogic.Dialogs;
@@ -11,16 +9,19 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml;
+using System.Threading.Tasks;
 
 namespace SEC2ON.LBSecconBusinessLogic
 {
     public class SecconBL
     {
-        #region fields        
+        #region properties        
 
         public SECCONFORM GUI = null;
         public PWHandler PWManager = new PWHandler(Convert.ToInt32(Properties.Resources.timeOutPasswordHandler)); //Passwordhandler
@@ -51,11 +52,13 @@ namespace SEC2ON.LBSecconBusinessLogic
 
         #endregion
 
-        #region members
+        #region fields
         
         private DateTime m_lastsync = DateTime.MinValue;
         private Boolean m_showlogins = true;
-        private DropNet.Models.UserLogin dbuserlogin = new DropNet.Models.UserLogin();
+        
+        private string LoginToken;
+        private string LoginUid;
 
         #endregion
 
@@ -1905,31 +1908,26 @@ namespace SEC2ON.LBSecconBusinessLogic
         }
 
         //Download database from dropbox
-        public void dropboxDownloadDB()
+        public async Task dropboxDownloadDB()
         {
-            //precondition: check if dropbox is connected
-            if (!dropboxCheckLogin()) return;
-
             //Get a list of available databases on the dropbox
             List<OnlineDatabase> onlineDBs = new List<OnlineDatabase>();
             try
-            {
-                DropNetClient db = new DropNetClient(Properties.Settings.Default.dropboxAppKey, Properties.Settings.Default.dropboxAppSecret);
-                db.UserLogin = dbuserlogin;
-                db.UseSandbox = true;
-
-                var m = db.GetMetaData("/");
+            {   
+                var dbclient = getdropboxClient();
+                
+                var m = await dbclient.Files.ListFolderAsync("");
 
                 //Gain all files in the directory, they will be distinguished in OnlineDatabase-Class
-                for (int i = 0; i < m.Contents.Count; i++)
+                foreach(var item in m.Entries.Where(c => c.IsFile))
                 {
-                    OnlineDatabase newdb = new OnlineDatabase(m.Contents[i].Name, m.Contents[i].Size, m.Contents[i].ModifiedDate);
+                    OnlineDatabase newdb = new OnlineDatabase(item.AsFile.Name, item.AsFile.Size.ToString(), item.AsFile.ServerModified);
                     onlineDBs.Add(newdb);
                 }
             }
-            catch (DropNet.Exceptions.DropboxException ex)
+            catch (DropboxException ex)
             {
-                GUI.updateLog(4, String.Format("There was an error while getting a list of available databases: {0}", ex.Response.StatusDescription));
+                GUI.updateLog(4, String.Format("There was an error while getting a list of available databases: {0}", ex.Message));
                 return;
             }
 
@@ -1963,19 +1961,17 @@ namespace SEC2ON.LBSecconBusinessLogic
             Filename = newdbname.FileName;
 
             //Save database
-            if (!this.dropboxFileOperations("/" + selectdb.SelectedDB, Filename, dropboxFileOperation.Download))
+            if (await dropboxFileOperations(selectdb.SelectedDB, Filename, dropboxFileOperation.Download))
             {
-                return;
+                //Open database after downloading
+                this.open_database(Filename);
             }
-
-            //Open database after downloading
-            this.open_database(Filename);
 
             return;
         }
 
         //Synchronize with dropbox
-        public void dropboxSynchronizeDB()
+        public async Task dropboxSynchronizeDB()
         {
             //precondition: check if database is unlocked
             if (!this.UnlockDB(check: true)) return;
@@ -1990,17 +1986,16 @@ namespace SEC2ON.LBSecconBusinessLogic
             Application.DoEvents();
 
             //precondition: check if there's a version of the database on the dropbox, if not just copy it there
-            DropNetClient db = new DropNetClient(Properties.Settings.Default.dropboxAppKey, Properties.Settings.Default.dropboxAppSecret);
-            db.UserLogin = dbuserlogin;
-            db.UseSandbox = true;
+            var dbclient = getdropboxClient();
 
-            var m = db.GetMetaData("/");
-            if (!m.Contents.Any(c => c.Name == Path.GetFileName(Filename)))
+            var m = await dbclient.Files.ListFolderAsync("");
+
+            if (!m.Entries.Any(c => c.IsFile && c.Name == Path.GetFileName(Filename)))
             {
                 DialogResult notExistentUpload = MessageBox.Show("There is no version of your database online. Would you upload a copy?", "Synchronize with dropbox...", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
                 if (notExistentUpload == DialogResult.Yes)
                 {
-                    if (dropboxFileOperations("/" + Path.GetFileName(Filename), dropboxFileOperation.Upload))
+                    if (await dropboxFileOperations(Path.GetFileName(Filename), dropboxFileOperation.Upload))
                     {
                         GUI.updateLog(2, "There was no version of your database online but a copy was uploaded.");
                         return;
@@ -2025,7 +2020,7 @@ namespace SEC2ON.LBSecconBusinessLogic
             Application.DoEvents();
 
             //store a temporary copy of the dropbox version locally
-            if (!this.dropboxFileOperations("/" + Path.GetFileName(Filename), Path.Combine(Application.LocalUserAppDataPath, Properties.Resources.TempDBFile), dropboxFileOperation.Download))
+            if (!await dropboxFileOperations(Path.GetFileName(Filename), Path.Combine(Application.LocalUserAppDataPath, Properties.Resources.TempDBFile), dropboxFileOperation.Download))
             {
                 return;
             }
@@ -2036,7 +2031,7 @@ namespace SEC2ON.LBSecconBusinessLogic
             SynchronizeDatabasesResult result = this.synchronizeDatabases(Path.Combine(Application.LocalUserAppDataPath, Properties.Resources.TempDBFile), ref updated, ref updatedpgp);
             if (result == SynchronizeDatabasesResult.OverwriteTarget)
             {
-                if (dropboxFileOperations("/" + Path.GetFileName(Filename), dropboxFileOperation.Upload))
+                if (await dropboxFileOperations(Path.GetFileName(Filename), dropboxFileOperation.Upload))
                 {
                     GUI.updateLog(2, "The online version of the database was overwritten by the local database. A backup copy was created on the dropbox.");
                     return;
@@ -2063,7 +2058,7 @@ namespace SEC2ON.LBSecconBusinessLogic
 
             Application.DoEvents();
 
-            if (!this.dropboxFileOperations(Filename, dropboxFileOperation.Upload))
+            if (!await this.dropboxFileOperations(Filename, dropboxFileOperation.Upload))
             {
                 //write no further error text to the toolstrip since the details were written by dropboxFileOperations()
                 DialogResult res = MessageBox.Show("Saving the database to the dropbox failed. Please try again.", "Synchronize database...", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -2079,34 +2074,33 @@ namespace SEC2ON.LBSecconBusinessLogic
 
         //Up- or downloading files to or from the dropbox
         enum dropboxFileOperation { Download, Upload, Delete, Copy };
-        private bool dropboxFileOperations(string dbname, dropboxFileOperation fileop)
+        private async Task<bool> dropboxFileOperations(string dbname, dropboxFileOperation fileop)
         {
-            return dropboxFileOperations(dbname, dbname, fileop);
+            return await dropboxFileOperations(dbname, dbname, fileop);
         }
-        private bool dropboxFileOperations(string dbname, string destname, dropboxFileOperation fileop)
+        private async Task<bool> dropboxFileOperations(string dbname, string destname, dropboxFileOperation fileop)
         {
             try
             {
-                DropNetClient db = new DropNetClient(Properties.Settings.Default.dropboxAppKey, Properties.Settings.Default.dropboxAppSecret);
-                db.UserLogin = dbuserlogin;
-                db.UseSandbox = true;
-
+                var dbclient = getdropboxClient();
+                
                 #region delete
                 //delete database
                 if (fileop == dropboxFileOperation.Delete)
                 {
-                    try
+                    var m = await dbclient.Files.ListFolderAsync("");
+
+                    if (m.Entries.Any(c => c.IsFile && c.Name == Path.GetFileName(dbname)))
                     {
-                        var m = db.GetMetaData("/");
-                        if (m.Contents.Any(c => c.Name == dbname))
+                        try
                         {
-                            db.Delete(dbname);
+                            await dbclient.Files.DeleteV2Async("/" + dbname);
                         }
-                    }
-                    catch (DropNet.Exceptions.DropboxException ex)
-                    {
-                        GUI.updateLog(4, string.Format("Cannot delete online database: {0}", ex.Response.StatusDescription));
-                        return false;
+                        catch (DropboxException ex)
+                        {
+                            GUI.updateLog(4, string.Format("Cannot delete online database: {0}", ex.Message));
+                            return false;
+                        }
                     }
                     return true;
                 }
@@ -2123,15 +2117,11 @@ namespace SEC2ON.LBSecconBusinessLogic
                     }
                     try
                     {
-                        var m = db.GetMetaData("/");
-                        if (m.Contents.Any(c => c.Name == Path.GetFileName(dbname)))
-                        {
-                            db.Copy(Path.GetFileName(dbname), destname);
-                        }
+                        await dbclient.Files.CopyV2Async("/" + dbname, "/" + destname);                        
                     }
-                    catch (DropNet.Exceptions.DropboxException ex)
+                    catch (DropboxException ex)
                     {
-                        GUI.updateLog(4, string.Format("Cannot make a backup of the database: {0}", ex.Response.StatusDescription));
+                        GUI.updateLog(4, string.Format("Cannot make a backup of the database: {0}", ex.Message));
                         return false;
                     }
                     return true;
@@ -2144,21 +2134,23 @@ namespace SEC2ON.LBSecconBusinessLogic
                 {
                     try
                     {
-                        var fileBytes = db.GetFile(("/" + Path.GetFileName(dbname)));
+                        var file = await dbclient.Files.DownloadAsync("/" + Path.GetFileName(dbname));
 
                         using (FileStream dbfile = new FileStream(destname, FileMode.Create, FileAccess.Write, FileShare.Read))
                         {
+                            var fileBytes = await file.GetContentAsByteArrayAsync();
+
                             dbfile.Write(fileBytes, 0, fileBytes.Length);
                         }
                     }
-                    catch (DropNet.Exceptions.DropboxException ex)
+                    catch (DropboxException ex)
                     {
-                        GUI.updateLog(4, string.Format("There was an error downloading the database: {0}", ex.Response.StatusDescription));
+                        GUI.updateLog(4, string.Format("There was an error downloading the database: {0}", ex.Message));
                         return false;
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        GUI.updateLog(4, string.Format("There was an error saving the database locally."));
+                        GUI.updateLog(4, string.Format("There was an error saving the database locally: {0}", ex.Message));
                         return false;
                     }
                     return true;
@@ -2172,34 +2164,38 @@ namespace SEC2ON.LBSecconBusinessLogic
                     //make a backup of the dropbox database first
                     //delete old backup (ignore if there's n othing to delete) 
                     //and make a new backup of the online database (claim if it is not possible except there's nothing to make a backup from)
+                    var m = await dbclient.Files.ListFolderAsync("");
 
-                    string backupFileName = Path.GetFileName(dbname).Replace(".sdb", Properties.Resources.ExtensionBackup);
-
-                    Boolean deletebackup = this.dropboxFileOperations(backupFileName, dropboxFileOperation.Delete);
-                    Boolean copydatabase = this.dropboxFileOperations(dbname, backupFileName, dropboxFileOperation.Copy);
-                    if (!deletebackup || !copydatabase)
+                    if (m.Entries.Any(c => c.IsFile && c.Name == Path.GetFileName(dbname)))
                     {
-                        DialogResult proceedWithoutBackup = MessageBox.Show("Making a copy of the online version of the database failed. Would you proceed without making a copy the online version?",
-                            "Uploading database to dropbox...", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                        if (proceedWithoutBackup == DialogResult.No) return false;
+                        string backupFileName = Path.GetFileName(dbname).Replace(".sdb", Properties.Resources.ExtensionBackup);
+
+                        bool deletebackup = await dropboxFileOperations(backupFileName, dropboxFileOperation.Delete);
+                        bool copydatabase = await dropboxFileOperations(Path.GetFileName(dbname), backupFileName, dropboxFileOperation.Copy);
+                        if (!deletebackup || !copydatabase)
+                        {
+                            DialogResult proceedWithoutBackup = MessageBox.Show("Making a copy of the online version of the database failed. Would you proceed without making a copy the online version?",
+                                "Uploading database to dropbox...", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                            if (proceedWithoutBackup == DialogResult.No) return false;
+                        }
                     }
 
                     try
                     {
                         //save actual database to dropbox
-                        MemoryStream f = new MemoryStream();
-                        using (FileStream dbfile = new FileStream(Filename, FileMode.Open, FileAccess.Read, FileShare.None))
+                        using (MemoryStream f = new MemoryStream())
                         {
-                            dbfile.CopyTo(f);
+                            using (FileStream dbfile = new FileStream(Filename, FileMode.Open, FileAccess.Read, FileShare.None))
+                            {
+                                //dbfile.CopyTo(f);
+
+                                await dbclient.Files.UploadAsync("/" + Path.GetFileName(dbname), WriteMode.Overwrite.Instance, body: dbfile);
+                            }
                         }
-
-                        byte[] content = f.ToArray();
-
-                        var uploaded = db.UploadFile("/", Path.GetFileName(dbname), content);
                     }
-                    catch (DropNet.Exceptions.DropboxException ex)
+                    catch (DropboxException ex)
                     {
-                        GUI.updateLog(4, string.Format("There was an error uploading the database: {0}", ex.Response.StatusDescription));
+                        GUI.updateLog(4, string.Format("There was an error uploading the database: {0}", ex.Message));
                         return false;
                     }
                     catch
@@ -2211,9 +2207,9 @@ namespace SEC2ON.LBSecconBusinessLogic
                 }
                 #endregion
             }
-            catch (DropNet.Exceptions.DropboxException ex)
+            catch (DropboxException ex)
             {
-                GUI.updateLog(4, string.Format("There was an error while accessing your dropbox: {0}", ex.Response.StatusDescription));
+                GUI.updateLog(4, string.Format("There was an error while accessing your dropbox: {0}", ex.Message));
                 return false;
             }
 
@@ -2224,8 +2220,6 @@ namespace SEC2ON.LBSecconBusinessLogic
         //check for dropboxuserlogin and load it
         private bool dropboxLoadUserLogin()
         {
-            bool loginexists = false;
-
             if (File.Exists(string.Format(Path.Combine(Application.LocalUserAppDataPath, Path.Combine(Application.LocalUserAppDataPath, "dbuser_{0}")), System.Security.Principal.WindowsIdentity.GetCurrent().Name.GetHashCode().ToString())))
             {
                 try
@@ -2233,14 +2227,14 @@ namespace SEC2ON.LBSecconBusinessLogic
                     using (StreamReader dbfile = new StreamReader(string.Format(Path.Combine(Application.LocalUserAppDataPath, "dbuser_{0}"), System.Security.Principal.WindowsIdentity.GetCurrent().Name.GetHashCode().ToString())))
                     {
                         byte[] enctoken = Convert.FromBase64String(dbfile.ReadLine());
-                        byte[] encsecret = Convert.FromBase64String(dbfile.ReadLine());
+                        byte[] encuid = Convert.FromBase64String(dbfile.ReadLine());
                         byte[] token = ProtectedData.Unprotect(enctoken, null, DataProtectionScope.CurrentUser);
-                        byte[] secret = ProtectedData.Unprotect(encsecret, null, DataProtectionScope.CurrentUser);
+                        byte[] uid = ProtectedData.Unprotect(encuid, null, DataProtectionScope.CurrentUser);
 
-                        dbuserlogin.Token = Encoding.UTF8.GetString(token);
-                        dbuserlogin.Secret = Encoding.UTF8.GetString(secret);
+                        LoginToken = Encoding.UTF8.GetString(token);
+                        LoginUid = Encoding.UTF8.GetString(uid);
 
-                        loginexists = true;
+                        return true;
                     }
                 }
                 catch
@@ -2248,80 +2242,82 @@ namespace SEC2ON.LBSecconBusinessLogic
                     return false;
                 }
             }
-
-            return loginexists;
+            else
+                return false;
         }
 
         //register to dropbox and get authentification
         public bool dropboxAuthentification()
         {
-            bool authsucceed = false;
-
-            while (!authsucceed)
+            try
             {
-                try
+                var login = new LoginForm(Properties.Settings.Default.dropboxAppKey);
+
+                login.ShowDialog();
+
+                if (login.Result)
                 {
-                    //throw new NotImplementedException();
-
-                    //DropNetClient db = new DropNetClient(Properties.Settings.Default.dropboxAppKey, Properties.Settings.Default.dropboxAppSecret);
-
-                    ////1. Get request token
-                    //db.GetToken();
-
-                    ////2. Authorize App with Dropbo
-                    //var url = db.BuildAuthorizeUrl();
-                    //System.Diagnostics.Process.Start(url);
-                    var oauth2State = Guid.NewGuid().ToString("N");
-                    var authorizeUri = DropboxOAuth2Helper.GetAuthorizeUri(OAuthResponseType.Token, Properties.Settings.Default.dropboxAppKey, new Uri("https://localhost/authorize"), state: oauth2State);
-                    System.Diagnostics.Process.Start(authorizeUri.ToString());
-
-                    ////2.5 if the user completes his authentification proceed
-                    DialogResult authdiag = MessageBox.Show("Click \"Ok\" if you complete your dropbox authentification.", "Dropbox authentification needed...", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
-                    if (authdiag == DialogResult.Cancel) return false;
-
-                    ////3. Get an Access Token from the Request Token
-                    //var accessToken = db.GetAccessToken();
-
-                    //dbuserlogin = accessToken;
-
-                    //this.dropboxStoreLogin(dbuserlogin);
-
-                    //db.UserLogin = new DropNet.Models.UserLogin { Token = accessToken.Token, Secret = accessToken.Secret };
-
-                    //authsucceed = true;
+                    dropboxStoreLogin(login.AccessToken, login.Uid);
+                    GUI.updateLog(2, string.Format("Dropbox connected succesfully."));
+                    return true;
                 }
-                catch (DropNet.Exceptions.DropboxException ex)
-                {
-                    GUI.updateLog(4, string.Format("There was an error while login to your dropbox: {0}", ex.Response.StatusDescription));
+                else
                     return false;
-                }
-                catch (Exception ex)
-                {
-                    GUI.updateLog(4, string.Format("There was an fatal error while login to your dropbox: {0}", ex.Message));
-                    return false;
-                }
             }
-            return true;
+            catch (DropboxException ex)
+            {
+                GUI.updateLog(4, string.Format("There was an error while login to your dropbox: {0}", ex.Message));
+                return false;
+            }
+            catch (Exception ex)
+            {
+                GUI.updateLog(4, string.Format("There was an fatal error while login to your dropbox: {0}", ex.Message));
+                return false;
+            }
         }
 
         //save dropboxlogin
-        private void dropboxStoreLogin(DropNet.Models.UserLogin userlogin)
+        private void dropboxStoreLogin(string Token, string Uid)
         {
             try
             {
                 using (StreamWriter dbfile = new StreamWriter(string.Format(Path.Combine(Application.LocalUserAppDataPath, "dbuser_{0}"), System.Security.Principal.WindowsIdentity.GetCurrent().Name.GetHashCode().ToString())))
                 {
-                    byte[] token = Encoding.UTF8.GetBytes(userlogin.Token);
+                    byte[] token = Encoding.UTF8.GetBytes(Token);
                     byte[] enctoken = ProtectedData.Protect(token, null, DataProtectionScope.CurrentUser);
-                    byte[] secret = Encoding.UTF8.GetBytes(userlogin.Secret);
-                    byte[] encsecret = ProtectedData.Protect(secret, null, DataProtectionScope.CurrentUser);
+                    byte[] uid = Encoding.UTF8.GetBytes(Uid);
+                    byte[] encuid = ProtectedData.Protect(uid, null, DataProtectionScope.CurrentUser);
                     
                     dbfile.WriteLine(Convert.ToBase64String(enctoken));
-                    dbfile.WriteLine(Convert.ToBase64String(encsecret));
+                    dbfile.WriteLine(Convert.ToBase64String(encuid));
                 }
             }
             catch { }
             return;
+        }
+
+        //get DropBoxConfigClient
+        private DropboxClient getdropboxClient()
+        {
+            //precondition: check if dropbox is connected
+            if (!dropboxCheckLogin())
+                return null;
+
+            // Specify socket level timeout which decides maximum waiting time when no bytes are
+            // received by the socket.
+            var httpClient = new HttpClient(new WebRequestHandler { ReadWriteTimeout = 10 * 1000 })
+            {
+                // Specify request level timeout which decides maximum time that can be spent on
+                // download/upload files.
+                Timeout = TimeSpan.FromMinutes(20)
+            };
+
+            var client = new DropboxClientConfig("Seccon")
+            {
+                HttpClient = httpClient
+            };
+
+            return new DropboxClient(LoginToken, client);
         }
         #endregion
 

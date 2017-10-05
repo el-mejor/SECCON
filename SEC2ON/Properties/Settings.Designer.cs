@@ -25,7 +25,7 @@ namespace SEC2ON.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("replaceWithYourCredentials")]
+        [global::System.Configuration.DefaultSettingValueAttribute("j93h8yfahdiudog")]
         public string dropboxAppKey {
             get {
                 return ((string)(this["dropboxAppKey"]));
@@ -44,6 +44,18 @@ namespace SEC2ON.Properties {
             }
             set {
                 this["dropboxAppSecret"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://localhost/authorize")]
+        public string dropboxRedirectUrl {
+            get {
+                return ((string)(this["dropboxRedirectUrl"]));
+            }
+            set {
+                this["dropboxRedirectUrl"] = value;
             }
         }
     }

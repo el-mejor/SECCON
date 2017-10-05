@@ -21,11 +21,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Release", "_Release", "{9297C9BE-0A12-4618-83AD-0714CF36A657}"
 	ProjectSection(SolutionItems) = preProject
 		SEC2ON\bin\Release\BouncyCastle.Crypto.dll = SEC2ON\bin\Release\BouncyCastle.Crypto.dll
-		SEC2ON\bin\Release\DropNet.dll = SEC2ON\bin\Release\DropNet.dll
+		SEC2ON\bin\Release\Dropbox.Api.dll = SEC2ON\bin\Release\Dropbox.Api.dll
+		SEC2ON\bin\Release\Dropbox.Api.xml = SEC2ON\bin\Release\Dropbox.Api.xml
 		SEC2ON\bin\Release\LBPasswordAndCryptoServices.dll = SEC2ON\bin\Release\LBPasswordAndCryptoServices.dll
 		SEC2ON\bin\Release\LBPasswordAndCryptoServices.pdb = SEC2ON\bin\Release\LBPasswordAndCryptoServices.pdb
-		SEC2ON\bin\Release\RestSharp.dll = SEC2ON\bin\Release\RestSharp.dll
-		SEC2ON\bin\Release\RestSharp.xml = SEC2ON\bin\Release\RestSharp.xml
+		SEC2ON\bin\Release\Newtonsoft.Json.dll = SEC2ON\bin\Release\Newtonsoft.Json.dll
+		SEC2ON\bin\Release\Newtonsoft.Json.xml = SEC2ON\bin\Release\Newtonsoft.Json.xml
 		SEC2ON\bin\Release\SEC2ON.exe = SEC2ON\bin\Release\SEC2ON.exe
 		SEC2ON\bin\Release\SEC2ON.exe.config = SEC2ON\bin\Release\SEC2ON.exe.config
 	EndProjectSection
@@ -40,12 +41,14 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{136C48BB-9E50-4163-B3A2-DA141D7C35C6}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{136C48BB-9E50-4163-B3A2-DA141D7C35C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{136C48BB-9E50-4163-B3A2-DA141D7C35C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{136C48BB-9E50-4163-B3A2-DA141D7C35C6}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
 		{136C48BB-9E50-4163-B3A2-DA141D7C35C6}.Debug|Mixed Platforms.Build.0 = Debug|x86
 		{136C48BB-9E50-4163-B3A2-DA141D7C35C6}.Debug|x86.ActiveCfg = Debug|x86
 		{136C48BB-9E50-4163-B3A2-DA141D7C35C6}.Debug|x86.Build.0 = Debug|x86
-		{136C48BB-9E50-4163-B3A2-DA141D7C35C6}.Release|Any CPU.ActiveCfg = Release|x86
+		{136C48BB-9E50-4163-B3A2-DA141D7C35C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{136C48BB-9E50-4163-B3A2-DA141D7C35C6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{136C48BB-9E50-4163-B3A2-DA141D7C35C6}.Release|Mixed Platforms.ActiveCfg = Release|x86
 		{136C48BB-9E50-4163-B3A2-DA141D7C35C6}.Release|Mixed Platforms.Build.0 = Release|x86
 		{136C48BB-9E50-4163-B3A2-DA141D7C35C6}.Release|x86.ActiveCfg = Release|x86

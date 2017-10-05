@@ -3,10 +3,13 @@
   <Profiles />
   <Settings>
     <Setting Name="dropboxAppKey" Type="System.String" Scope="User">
-      <Value Profile="(Default)">replaceWithYourCredentials</Value>
+      <Value Profile="(Default)">j93h8yfahdiudog</Value>
     </Setting>
     <Setting Name="dropboxAppSecret" Type="System.String" Scope="User">
       <Value Profile="(Default)">replaceWithYourCredentials</Value>
+    </Setting>
+    <Setting Name="dropboxRedirectUrl" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://localhost/authorize</Value>
     </Setting>
   </Settings>
 </SettingsFile>

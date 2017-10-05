@@ -1258,19 +1258,18 @@ namespace SEC2ON
                 indexes.Add(Convert.ToInt16(i.Name));
             }
             secconbl.exportItem(indexes, SecconBL.exportItemsEncryption.PGP);
-
         }
 
         //Download database from dropbox (forward to dropbox function)
-        private void loadFromDropboxToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void loadFromDropboxToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            secconbl.dropboxDownloadDB();
+            await secconbl.dropboxDownloadDB();
         }
 
         //Synchronize with dropbox (forward to dropbox function)
-        private void synchronizeWithDropboxToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void synchronizeWithDropboxToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            secconbl.dropboxSynchronizeDB();
+            await secconbl.dropboxSynchronizeDB();
 
             //refresh the listview
             secconbl.m_groups.Clear();
@@ -1287,7 +1286,8 @@ namespace SEC2ON
             DialogResult deldbuserfile = MessageBox.Show("Would you really disconnect from your dropbox? You can reconnect to your dropbox later again.", "Disconnect from dropbox...", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             try
             {
-                if (deldbuserfile == DialogResult.Yes) File.Delete(string.Format("dbuser_{0}", System.Security.Principal.WindowsIdentity.GetCurrent().Name.GetHashCode().ToString()));
+                if (deldbuserfile == DialogResult.Yes)
+                    File.Delete(string.Format("dbuser_{0}", System.Security.Principal.WindowsIdentity.GetCurrent().Name.GetHashCode().ToString()));
                 this.updateLog(2, string.Format("Dropbox connection information was deleted."));
             }
             catch
