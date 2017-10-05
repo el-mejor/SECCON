@@ -247,12 +247,9 @@
     <Content Include="key-64.ico" />
     <Content Include="Release\BouncyCastle.Crypto.dll" />
     <Content Include="Release\Dropbox.Api.dll" />
-    <Content Include="Release\Dropbox.Api.xml" />
     <Content Include="Release\LBPasswordAndCryptoServices.dll" />
     <Content Include="Release\Newtonsoft.Json.dll" />
-    <Content Include="Release\Newtonsoft.Json.xml" />
     <Content Include="Release\SEC2ON.exe" />
-    <Content Include="Release\SEC2ON.pdb" />
     <Content Include="Release\SEC2ON.vshost.exe" />
     <Content Include="Src\License.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
