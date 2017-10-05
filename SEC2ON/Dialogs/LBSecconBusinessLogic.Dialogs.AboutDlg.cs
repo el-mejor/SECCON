@@ -16,7 +16,7 @@ namespace SEC2ON.LBSecconBusinessLogic.Dialogs
             if (Assembly.GetEntryAssembly().GetName().Version.Revision > 0)
                 labelVersion.Text += $"-beta{Assembly.GetEntryAssembly().GetName().Version.Revision}";
 
-            using (StreamReader s = new StreamReader("Src\\License.md"))
+            using (StreamReader s = new StreamReader(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Src\\License.md")))
             {
                 while(!s.EndOfStream)
                     textBoxLicense.Text += s.ReadLine() + Environment.NewLine;

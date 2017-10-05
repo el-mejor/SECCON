@@ -24,7 +24,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Release", "_Release", "{92
 		SEC2ON\bin\Release\Dropbox.Api.dll = SEC2ON\bin\Release\Dropbox.Api.dll
 		SEC2ON\bin\Release\Dropbox.Api.xml = SEC2ON\bin\Release\Dropbox.Api.xml
 		SEC2ON\bin\Release\LBPasswordAndCryptoServices.dll = SEC2ON\bin\Release\LBPasswordAndCryptoServices.dll
-		SEC2ON\bin\Release\LBPasswordAndCryptoServices.pdb = SEC2ON\bin\Release\LBPasswordAndCryptoServices.pdb
 		SEC2ON\bin\Release\Newtonsoft.Json.dll = SEC2ON\bin\Release\Newtonsoft.Json.dll
 		SEC2ON\bin\Release\Newtonsoft.Json.xml = SEC2ON\bin\Release\Newtonsoft.Json.xml
 		SEC2ON\bin\Release\SEC2ON.exe = SEC2ON\bin\Release\SEC2ON.exe
