@@ -137,7 +137,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classes\LBSecconBusinessLogic.Classes.cs" />
+    <Compile Include="Classes\LBSecconBusinessLogic.Classes.OnlineDataBase.cs" />
+    <Compile Include="Classes\LBSecconBusinessLogic.Classes.ItemHandler.cs" />
+    <Compile Include="Classes\LBSecconBusinessLogic.Classes.DataBaseHandler.cs" />
+    <Compile Include="Classes\LBSecconBusinessLogic.DropboxHelper.cs" />
+    <Compile Include="Classes\LBSecconBusinessLogic.Classes.WatchChanges.cs" />
+    <Compile Include="Classes\LBSecconBusinessLogic.Classes.Selftest.cs" />
     <Compile Include="Classes\LBSecconBusinessLogic.cs" />
     <Compile Include="Controlls\LBSecconBusinessLogic.Dialogs.Controlls.dayscale.cs">
       <SubType>UserControl</SubType>
