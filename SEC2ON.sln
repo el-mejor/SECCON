@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SEC2ON", "SEC2ON\SEC2ON.csproj", "{136C48BB-9E50-4163-B3A2-DA141D7C35C6}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -17,18 +17,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dev", "Dev", "{200EB8D1-7B8
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projects", "Projects", "{0123797B-C573-420B-9F14-296CAF44A9D6}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Release", "_Release", "{9297C9BE-0A12-4618-83AD-0714CF36A657}"
-	ProjectSection(SolutionItems) = preProject
-		SEC2ON\bin\Release\BouncyCastle.Crypto.dll = SEC2ON\bin\Release\BouncyCastle.Crypto.dll
-		SEC2ON\bin\Release\Dropbox.Api.dll = SEC2ON\bin\Release\Dropbox.Api.dll
-		SEC2ON\bin\Release\Dropbox.Api.xml = SEC2ON\bin\Release\Dropbox.Api.xml
-		SEC2ON\bin\Release\LBPasswordAndCryptoServices.dll = SEC2ON\bin\Release\LBPasswordAndCryptoServices.dll
-		SEC2ON\bin\Release\Newtonsoft.Json.dll = SEC2ON\bin\Release\Newtonsoft.Json.dll
-		SEC2ON\bin\Release\Newtonsoft.Json.xml = SEC2ON\bin\Release\Newtonsoft.Json.xml
-		SEC2ON\bin\Release\SEC2ON.exe = SEC2ON\bin\Release\SEC2ON.exe
-		SEC2ON\bin\Release\SEC2ON.exe.config = SEC2ON\bin\Release\SEC2ON.exe.config
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
