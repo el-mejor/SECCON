@@ -28,7 +28,7 @@ namespace SEC2ON.LBSecconBusinessLogic.Dialogs
         public int Index { set { m_index = value; } }
 
         bool m_newitem = false;
-        public Boolean NewItem { set { m_newitem = value; } }
+        public bool NewItem { set { m_newitem = value; } }
 
         SecItem.ItemType m_itemtype = SecItem.ItemType.Item;
         public SecItem.ItemType Itemtype { set { m_itemtype = value; } }
@@ -48,7 +48,7 @@ namespace SEC2ON.LBSecconBusinessLogic.Dialogs
         {
             InitializeComponent();            
         }
-        public Editentry(SecItem.ItemType ItemType, Boolean newitem, String filename, List<String> groupslist, List<SecItem> DBEntries, Int16 index, PWHandler pwmanager, WatchChanges DBwatcher)
+        public Editentry(SecItem.ItemType ItemType, bool newitem, String filename, List<String> groupslist, List<SecItem> DBEntries, Int16 index, PWHandler pwmanager, WatchChanges DBwatcher)
         {
             InitializeComponent();
 

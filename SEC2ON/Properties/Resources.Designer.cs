@@ -8,10 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SEC2ON.Properties
-{
-
-
+namespace SEC2ON.Properties {
+    using System;
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -67,42 +67,6 @@ namespace SEC2ON.Properties
             get {
                 object obj = ResourceManager.GetObject("elmejor", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .sdb_backup.
-        /// </summary>
-        internal static string ExtensionBackup {
-            get {
-                return ResourceManager.GetString("ExtensionBackup", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to ~synctemp.tmp.
-        /// </summary>
-        internal static string TempDBFile {
-            get {
-                return ResourceManager.GetString("TempDBFile", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 180000.
-        /// </summary>
-        internal static string timeOutPasswordHandler {
-            get {
-                return ResourceManager.GetString("timeOutPasswordHandler", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 10.
-        /// </summary>
-        internal static string timeToDeleteClipboardSeconds {
-            get {
-                return ResourceManager.GetString("timeToDeleteClipboardSeconds", resourceCulture);
             }
         }
     }

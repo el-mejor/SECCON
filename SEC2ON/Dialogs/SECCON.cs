@@ -16,11 +16,18 @@ namespace SEC2ON
 {
     public partial class SECCONFORM : Form
     {
+        #region fields
         private dayscale scale = new dayscale();
         private SecconBL secconbl = new SecconBL();
         private sortingOrderItems m_sorting = sortingOrderItems.AscName;
-        public bool EnableDebugLog { get; set; }
+        #endregion
 
+        #region properties
+        public bool EnableDebugLog { get; set; }
+        public enum LoggingType { Lock = 0, Unlocked = 1, Info = 2, Warning = 3, Error = 4, Synchronize = 5, LockYellow = 6 }
+        #endregion
+
+        #region ctor
         public SECCONFORM(string[] args)
         {
             string opendb = "";
@@ -41,7 +48,7 @@ namespace SEC2ON
             InitializeComponent();
 
             //Write title to the form
-            this.Text = "SECCON";
+            Text = "SECCON";
             toolStripVersion.Text = "V" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
 
             //Load BL
@@ -58,7 +65,7 @@ namespace SEC2ON
             scale.Width = 45;
             scale.Height = splitContainer2.Panel2.Height;
             scale.Maximum = 360;
-            scale.ContextMenuStrip = this.contextMenuStripObsoleteSettings;
+            scale.ContextMenuStrip = contextMenuStripObsoleteSettings;
             scale.Text = "PW Age" + Environment.NewLine + "[days]";
             scale.Unit = "";
             splitContainer2.Panel1.Controls.Add(scale);
@@ -70,29 +77,30 @@ namespace SEC2ON
             //open db if a valid db name was given
             if (secconbl.SelfTestResult && opendb != "")
             {
-                this.updateLog(2, string.Format("{0} - Ready.", secconbl.SelfTestResultString));
+                UpdateLog(LoggingType.Info, string.Format("{0} - Ready.", secconbl.SelfTestResultString));
 
                 if (Path.GetExtension(opendb).ToLower() == ".sdb")
                 {
-                    this.opendatabase(opendb);                                      
+                    opendatabase(opendb);                                      
                 }
                 if (Path.GetExtension(opendb).ToLower() == ".sef")
                 {
                     string[] files = new string[1];
                     files[0] = opendb;
                     secconbl.decryptfile(files, toolStripProgressBar1, openfile: false);
-                    this.Close();
+                    Close();
                 }
             }
             else if (secconbl.SelfTestResult)
             {
-                this.updateLog(2, string.Format("{0} - Ready.", secconbl.SelfTestResultString));
+                UpdateLog(LoggingType.Info, string.Format("{0} - Ready.", secconbl.SelfTestResultString));
             }
             else
             {
-                this.updateLog(4, secconbl.SelfTestResultString);
+                UpdateLog(LoggingType.Error, secconbl.SelfTestResultString);
             }            
         }
+        #endregion
 
         #region GUIFucntions and BL Forwarding  
         //Show the items in the listview - sort it into groups and only display items of the selected group
@@ -141,9 +149,9 @@ namespace SEC2ON
             }
 
             //Add generic groups                        
-            this.addgrouptogrouplist("*All", 0);
-            this.addgrouptogrouplist("*Expired", 0);
-            this.addgrouptogrouplist("*Search results", 10);
+            addgrouptogrouplist("*All", 0);
+            addgrouptogrouplist("*Expired", 0);
+            addgrouptogrouplist("*Search results", 10);
 
             int i = 0;
             int dbindex = 0;
@@ -157,7 +165,7 @@ namespace SEC2ON
                     Int16 groupicon = 0;
                     if (entry.GetGroupDefinitionFlag()) groupicon = entry.ImageIndex;
 
-                    this.addgrouptogrouplist(group, groupicon);
+                    addgrouptogrouplist(group, groupicon);
                 }
             }
 
@@ -219,8 +227,8 @@ namespace SEC2ON
                 //Add all possible groups to grouplist and count items
                 int groupicon = -1;
 
-                this.addgrouptogrouplist(group, groupicon);
-                this.countitemsineachgroup(group, itemissearchresult, DateTime.Compare(entry.ExpirationDate, DateTime.UtcNow));
+                addgrouptogrouplist(group, groupicon);
+                countitemsineachgroup(group, itemissearchresult, DateTime.Compare(entry.ExpirationDate, DateTime.UtcNow));
 
                 //Only show items of the selected group except *all is selected - in this case show each item
                 //If the *Search results group is selected only show items which fit the search string in the name 
@@ -308,11 +316,11 @@ namespace SEC2ON
 
             ////redraw legend
             scale.Maximum = secconbl.obsolete;
-            this.scale.Refresh();
+            scale.Refresh();
 
             TimeSpan perf = DateTime.Now - start;
 
-            if(EnableDebugLog) updateLog(2, string.Format("Refresh list in {0} ms.", perf.Milliseconds + perf.Seconds * 1000), true, Color.Magenta, Color.White);
+            if(EnableDebugLog) UpdateLog(LoggingType.Info, string.Format("Refresh list in {0} ms.", perf.Milliseconds + perf.Seconds * 1000), true, Color.Magenta, Color.White);
         }
 
         //Open a database
@@ -329,7 +337,7 @@ namespace SEC2ON
             checkBoxDetailsView.Checked = secconbl.DetailsView;
             allowSessionPinToolStripMenuItem.Checked = secconbl.AllowSessionPin;
 
-            this.showlist("*All");
+            showlist("*All");
         }
 
         //Add groups to grouplist
@@ -384,19 +392,25 @@ namespace SEC2ON
         }
 
         //Logging and Statusbar update
-        public void updateLog(int imageindex, string text, bool logonly = false)
+        [Obsolete]
+        public void UpdateLog(int imageindex, string text, bool logonly = false)
         {
-            this.updateLog(imageindex, text, logonly, Color.Black, listViewLog.BackColor);
+            UpdateLog(imageindex, text, logonly, Color.Black, listViewLog.BackColor);
         }
-        public void updateLog(int imageindex, string text, Color TextColor)
+        public void UpdateLog(LoggingType loggingtype, string text, bool logonly = false)
         {
-            this.updateLog(imageindex, text, true, TextColor, listViewLog.BackColor);
+            UpdateLog(loggingtype, text, logonly, Color.Black, listViewLog.BackColor);
         }
-        public void updateLog(int imageindex, string text, Color TextColor, Color BackColor)
+        public void updateLog(LoggingType loggingtype, string text, Color TextColor)
         {
-            this.updateLog(imageindex, text, true, TextColor, BackColor);
+            UpdateLog(loggingtype, text, true, TextColor, listViewLog.BackColor);
         }
-        public void updateLog(int imageindex, string text, bool logonly, Color TextColor, Color BackColor)
+        public void updateLog(LoggingType loggingtype, string text, Color TextColor, Color BackColor)
+        {
+            UpdateLog(loggingtype, text, true, TextColor, BackColor);
+        }
+        [Obsolete]
+        public void UpdateLog(int imageindex, string text, bool logonly, Color TextColor, Color BackColor)
         {
             if (!logonly)
             {
@@ -415,13 +429,32 @@ namespace SEC2ON
 
             listViewLog.Items[listViewLog.Items.Count - 1].EnsureVisible();
         }
+        public void UpdateLog(LoggingType loggingtype, string text, bool logonly, Color TextColor, Color BackColor)
+        {
+            if (!logonly)
+            {
+                toolStripOwner.Text = text;
+                toolStripOwner.Image = imageListToolStrip.Images[(int)loggingtype];
+            }
+
+            listViewLog.Items.Add(DateTime.Now.ToString());
+            if (loggingtype >= 0) listViewLog.Items[listViewLog.Items.Count - 1].ImageIndex = (int)loggingtype;
+
+            listViewLog.Items[listViewLog.Items.Count - 1].SubItems.Add(text);
+            listViewLog.Items[listViewLog.Items.Count - 1].ForeColor = TextColor;
+            listViewLog.Items[listViewLog.Items.Count - 1].BackColor = BackColor;
+
+            listViewLog.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+
+            listViewLog.Items[listViewLog.Items.Count - 1].EnsureVisible();
+        }
 
         //Close DB
-        private Boolean closedb()
+        private bool closedb()
         {
             if (!secconbl.closeDatabase()) return false;
 
-            this.Text = "SECCON";
+            Text = "SECCON";
 
             //clear all information of the database
             listViewAccounts.Clear();
@@ -463,8 +496,8 @@ namespace SEC2ON
 
             secconbl.editentry(index, imageList2);
 
-            if (listViewGroups.SelectedItems.Count >= 1) this.showlist(listViewGroups.SelectedItems[0].Text);
-            else this.showlist("*All");
+            if (listViewGroups.SelectedItems.Count >= 1) showlist(listViewGroups.SelectedItems[0].Text);
+            else showlist("*All");
         }
 
         //BrowseURL
@@ -476,7 +509,7 @@ namespace SEC2ON
                 try { System.Diagnostics.Process.Start(getelementsinfo.Url); }
                 catch
                 {
-                    this.updateLog(4, string.Format("Can not open the URL: {0}", getelementsinfo.Url));
+                    UpdateLog(LoggingType.Error, string.Format("Can not open the URL: {0}", getelementsinfo.Url));
                 }
             }
         }
@@ -496,14 +529,14 @@ namespace SEC2ON
             }
             catch
             {
-                this.updateLog(4, "There's no password, nothing to copy.");
+                UpdateLog(LoggingType.Error, "There's no password, nothing to copy.");
                 return;
             }
 
-            secconbl.Killclipboardtimerexpired = Convert.ToInt32(Properties.Resources.timeToDeleteClipboardSeconds); //time to kill clipboard
+            secconbl.Killclipboardtimerexpired = Convert.ToInt32(Properties.Settings.Default.timeToDeleteClipboardSeconds); //time to kill clipboard
             secconbl.Killclipboard.Start();
 
-            this.updateLog(3, string.Format("Password of \"{0}\" copied to clipboard. The clipboard will be deleted in 10 seconds.", getelementsinfo.Name), false, Color.Black, Color.Yellow);
+            UpdateLog(LoggingType.Warning, string.Format("Password of \"{0}\" copied to clipboard. The clipboard will be deleted in 10 seconds.", getelementsinfo.Name), false, Color.Black, Color.Yellow);
             toolStripProgressBar1.Visible = true;
             toolStripProgressBar1.Maximum = secconbl.Killclipboardtimerexpired;
         }
@@ -523,18 +556,18 @@ namespace SEC2ON
             }
             catch
             {
-                this.updateLog(4, "There's no username, nothing to copy.");
+                UpdateLog(LoggingType.Error, "There's no username, nothing to copy.");
                 return;
             }
 
-            this.updateLog(2, "Username / Login copied to clipboard.");
+            UpdateLog(LoggingType.Info, "Username / Login copied to clipboard.");
         }
 
         //Lock, Unlock Workspace
         public void LockWorkSpace(bool lockws)
         {
-            this.toolStrip1.Enabled = !lockws;
-            this.toolStrip2.Enabled = !lockws;
+            toolStrip1.Enabled = !lockws;
+            toolStrip2.Enabled = !lockws;
             listViewAccounts.Enabled = !lockws;
             listViewGroups.Enabled = !lockws;
         }
@@ -549,22 +582,22 @@ namespace SEC2ON
             secconbl.m_groups.Clear();
             listViewGroups.Clear(); //redundant?
 
-            if (listViewGroups.SelectedItems.Count == 1) this.showlist(listViewGroups.SelectedItems[0].Text);
-            else this.showlist("*All");
+            if (listViewGroups.SelectedItems.Count == 1) showlist(listViewGroups.SelectedItems[0].Text);
+            else showlist("*All");
         }
 
         //Create new database
         private void toolStripNew_Click_1(object sender, EventArgs e)
         {
-            if (!this.closedb()) return;
+            if (!closedb()) return;
             secconbl.CreateNewDatabase();
         }
 
         //Call open database
         private void toolStripOpen_Click_1(object sender, EventArgs e)
         {
-            if (!this.closedb()) return;
-            this.opendatabase(null);
+            if (!closedb()) return;
+            opendatabase(null);
         }
 
         //A item was selected in the listview
@@ -677,7 +710,7 @@ namespace SEC2ON
                 secconbl.killclipboard_tick(sender, e);
             }
 
-            if (!this.closedb()) e.Cancel = true;
+            if (!closedb()) e.Cancel = true;
         }
 
         //Forward to savedatabase
@@ -702,7 +735,7 @@ namespace SEC2ON
                 toolStripButtonMoveGroupUp.Enabled = true;
                 toolStripButtonMoveGroupDown.Enabled = true;
 
-                this.showlist(listViewGroups.SelectedItems[0].Text);
+                showlist(listViewGroups.SelectedItems[0].Text);
 
                 deleteEntryToolStripMenuItem.Enabled = true;
                 editEntryToolStripMenuItem.Enabled = true;
@@ -777,17 +810,17 @@ namespace SEC2ON
             allowSessionPinToolStripMenuItem.Checked = !allowSessionPinToolStripMenuItem.Checked;
             if (allowSessionPinToolStripMenuItem.Checked && !secconbl.Sessionpinactive)
             {
-                this.updateLog(2, "You will be asked for a session pin when you are opening the database in future.");
+                UpdateLog(LoggingType.Info, "You will be asked for a session pin when you are opening the database in future.");
             }
             if (!allowSessionPinToolStripMenuItem.Checked)
             {
-                this.updateLog(2, "You will not be asked for a session pin when you are opening the database in future.");
+                UpdateLog(LoggingType.Info, "You will not be asked for a session pin when you are opening the database in future.");
             }
             if (!allowSessionPinToolStripMenuItem.Checked && secconbl.Sessionpinactive)
             {
                 secconbl.PWManager.SetPin = null;
                 secconbl.Sessionpinactive = false;
-                this.updateLog(2, "The current session pin was invalidated. You will not be asked for a session pin when you are opening the database in future.");
+                UpdateLog(LoggingType.Info, "The current session pin was invalidated. You will not be asked for a session pin when you are opening the database in future.");
             }
 
         }
@@ -795,13 +828,13 @@ namespace SEC2ON
         //forward to closedatabase
         private void closeDatabaseToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.closedb();
+            closedb();
         }
 
         //forward to closedatabase
         private void toolStripButtonClose_Click(object sender, EventArgs e)
         {
-            this.closedb();
+            closedb();
         }
 
         //forward to editentry
@@ -817,8 +850,8 @@ namespace SEC2ON
             secconbl.m_groups.Clear();
             listViewGroups.Clear();
 
-            if (listViewGroups.SelectedItems.Count == 1) this.showlist(listViewGroups.SelectedItems[0].Text);
-            else this.showlist("*All");
+            if (listViewGroups.SelectedItems.Count == 1) showlist(listViewGroups.SelectedItems[0].Text);
+            else showlist("*All");
         }
 
         //forward to editentry
@@ -851,8 +884,8 @@ namespace SEC2ON
                 listViewGroups.Clear(); //redundant?
             }
 
-            if (listViewGroups.SelectedItems.Count == 1) this.showlist(listViewGroups.SelectedItems[0].Text);
-            else this.showlist("*All");
+            if (listViewGroups.SelectedItems.Count == 1) showlist(listViewGroups.SelectedItems[0].Text);
+            else showlist("*All");
         }
 
         //forward to add new item prepare
@@ -863,8 +896,8 @@ namespace SEC2ON
 
             if (secconbl.Filename != "") secconbl.addEmptyItem(SecItem.ItemType.Item, secconbl.DBEntries, selectedgroup, imageList2);
 
-            if (listViewGroups.SelectedItems.Count == 1) this.showlist(listViewGroups.SelectedItems[0].Text);
-            else this.showlist("*All");
+            if (listViewGroups.SelectedItems.Count == 1) showlist(listViewGroups.SelectedItems[0].Text);
+            else showlist("*All");
         }
 
         //forward to delete item
@@ -890,8 +923,8 @@ namespace SEC2ON
 
             
 
-            if (listViewGroups.SelectedItems.Count == 1) this.showlist(listViewGroups.SelectedItems[0].Text);
-            else this.showlist("*All");
+            if (listViewGroups.SelectedItems.Count == 1) showlist(listViewGroups.SelectedItems[0].Text);
+            else showlist("*All");
         }
 
         //forward to delete item
@@ -906,8 +939,8 @@ namespace SEC2ON
             if (listViewAccounts.SelectedItems.Count == 0) return;
             secconbl.deleteItem(indexes);
 
-            if (listViewGroups.SelectedItems.Count == 1) this.showlist(listViewGroups.SelectedItems[0].Text);
-            else this.showlist("*All");
+            if (listViewGroups.SelectedItems.Count == 1) showlist(listViewGroups.SelectedItems[0].Text);
+            else showlist("*All");
         }
 
         //context menu opening
@@ -916,8 +949,8 @@ namespace SEC2ON
             ContextMenuStrip menu = sender as ContextMenuStrip;
             Control Sender = menu.SourceControl;
 
-            if (Sender.Name == listViewAccounts.Name) this.contextMenuEnableItems(SelectedItemType.Item);
-            if (Sender.Name == listViewGroups.Name) this.contextMenuEnableItems(SelectedItemType.Group);
+            if (Sender.Name == listViewAccounts.Name) contextMenuEnableItems(SelectedItemType.Item);
+            if (Sender.Name == listViewGroups.Name) contextMenuEnableItems(SelectedItemType.Group);
         }
 
         //refresh list with new search string, handle watermark text
@@ -936,7 +969,7 @@ namespace SEC2ON
             //select the search results if it is not selected
             if(!listViewGroups.Items[2].Selected) listViewGroups.Items[2].Selected = true;
             
-            this.showlist(listViewGroups.Items[2].Text);
+            showlist(listViewGroups.Items[2].Text);
         }
 
         //Search text box selection
@@ -948,7 +981,7 @@ namespace SEC2ON
         //define a new master key for the database
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
-            updateLog(5, "Going to change masterkey...", false, Color.Black, Color.Yellow);
+            UpdateLog(LoggingType.Synchronize, "Going to change masterkey...", false, Color.Black, Color.Yellow);
 
             //ask for password
             secconbl.PWManager.Lock(PWHandler.PWHandlerEventArgs.PWHandlerLockReasonEnum.Internal);
@@ -962,7 +995,7 @@ namespace SEC2ON
 
             if (enternewpassword.DialogResult == DialogResult.Cancel)
             {
-                updateLog(2, "Action cancelled, masterkey has not been changed.");
+                UpdateLog(LoggingType.Info, "Action cancelled, masterkey has not been changed.");
                 return;
             }
 
@@ -992,8 +1025,8 @@ namespace SEC2ON
                 }
             }
 
-            if (countcleanedentries == 1) updateLog(5, string.Format("MAINTENANCE: It's a good time to clean up. {0} unused item has been removed.", countcleanedentries), logonly: true);
-            if (countcleanedentries > 1) updateLog(5, string.Format("MAINTENANCE: It's a good time to clean up. {0} unused items have been removed.", countcleanedentries), logonly: true);
+            if (countcleanedentries == 1) UpdateLog(LoggingType.Synchronize, string.Format("MAINTENANCE: It's a good time to clean up. {0} unused item has been removed.", countcleanedentries), logonly: true);
+            if (countcleanedentries > 1) UpdateLog(LoggingType.Synchronize, string.Format("MAINTENANCE: It's a good time to clean up. {0} unused items have been removed.", countcleanedentries), logonly: true);
 
             //decrypt and encrypt values with new master key, skip empty values since they belong to deleted items
             foreach (SecItem entry in secconbl.DBEntries)
@@ -1020,12 +1053,12 @@ namespace SEC2ON
 
             secconbl.PWManager.SetPin = null;
             secconbl.Sessionpinactive = false;
-            updateLog(5, "Masterkey changed. If a session pin was set it has been disabled for this session.", false, Color.Black, Color.Yellow);
+            UpdateLog(LoggingType.Synchronize, "Masterkey changed. If a session pin was set it has been disabled for this session.", false, Color.Black, Color.Yellow);
 
             if (countcleanedentries > 0)
             {
-                if (listViewGroups.SelectedItems.Count == 1) this.showlist(listViewGroups.SelectedItems[0].Text);
-                else this.showlist("*All");
+                if (listViewGroups.SelectedItems.Count == 1) showlist(listViewGroups.SelectedItems[0].Text);
+                else showlist("*All");
             }
         }
 
@@ -1036,13 +1069,13 @@ namespace SEC2ON
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
 
             LockWorkSpace(true);
-            secconbl.encryptfile(files, this.toolStripProgressBar1, imageList2);
+            secconbl.encryptfile(files, toolStripProgressBar1, imageList2);
             LockWorkSpace(false);
 
             if (secconbl.Filename != "")
             {
-                if (listViewGroups.SelectedItems.Count == 1) this.showlist(listViewGroups.SelectedItems[0].Text);
-                else this.showlist("*All");
+                if (listViewGroups.SelectedItems.Count == 1) showlist(listViewGroups.SelectedItems[0].Text);
+                else showlist("*All");
             }
         }
 
@@ -1067,13 +1100,13 @@ namespace SEC2ON
             string[] files = opendbname.FileNames;
 
             LockWorkSpace(true);
-            secconbl.encryptfile(files, this.toolStripProgressBar1, imageList2);
+            secconbl.encryptfile(files, toolStripProgressBar1, imageList2);
             LockWorkSpace(false);
 
             if (secconbl.Filename != "")
             {
-                if (listViewGroups.SelectedItems.Count == 1) this.showlist(listViewGroups.SelectedItems[0].Text);
-                else this.showlist("*All");
+                if (listViewGroups.SelectedItems.Count == 1) showlist(listViewGroups.SelectedItems[0].Text);
+                else showlist("*All");
             }
         }
 
@@ -1102,7 +1135,7 @@ namespace SEC2ON
         //close the database
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.closedb();
+            closedb();
         }
 
         //Show or hide usernames
@@ -1111,8 +1144,8 @@ namespace SEC2ON
             if (checkBoxShowUsernames.Checked) checkBoxShowUsernames.Checked = false;
             else checkBoxShowUsernames.Checked = true;
 
-            if (listViewGroups.SelectedItems.Count == 1) this.showlist(listViewGroups.SelectedItems[0].Text);
-            else this.showlist("*All");
+            if (listViewGroups.SelectedItems.Count == 1) showlist(listViewGroups.SelectedItems[0].Text);
+            else showlist("*All");
 
             secconbl.ShowUserNameIsActive = checkBoxShowUsernames.Checked;
         }
@@ -1123,8 +1156,8 @@ namespace SEC2ON
             if (checkBoxHighlightAge.Checked) checkBoxHighlightAge.Checked = false;
             else checkBoxHighlightAge.Checked = true;
 
-            if (listViewGroups.SelectedItems.Count == 1) this.showlist(listViewGroups.SelectedItems[0].Text);
-            else this.showlist("*All");
+            if (listViewGroups.SelectedItems.Count == 1) showlist(listViewGroups.SelectedItems[0].Text);
+            else showlist("*All");
 
             secconbl.HighLightPasswordAge = checkBoxHighlightAge.Checked;
         }
@@ -1135,8 +1168,8 @@ namespace SEC2ON
             if (checkBoxDetailsView.Checked) checkBoxDetailsView.Checked = false;
             else checkBoxDetailsView.Checked = true;
 
-            if (listViewGroups.SelectedItems.Count == 1) this.showlist(listViewGroups.SelectedItems[0].Text);
-            else this.showlist("*All");
+            if (listViewGroups.SelectedItems.Count == 1) showlist(listViewGroups.SelectedItems[0].Text);
+            else showlist("*All");
 
             secconbl.DetailsView = checkBoxDetailsView.Checked;
         }
@@ -1144,39 +1177,39 @@ namespace SEC2ON
         //close app
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         //set obsolete value
         private void daysToolStripMenuItem_Click(object sender, EventArgs e)
         {
             secconbl.obsolete = 30.0;
-            if (listViewGroups.SelectedItems.Count == 1) this.showlist(listViewGroups.SelectedItems[0].Text);
-            else this.showlist("*All");
+            if (listViewGroups.SelectedItems.Count == 1) showlist(listViewGroups.SelectedItems[0].Text);
+            else showlist("*All");
         }
 
         //set obsolete value
         private void daysToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             secconbl.obsolete = 90.0;
-            if (listViewGroups.SelectedItems.Count == 1) this.showlist(listViewGroups.SelectedItems[0].Text);
-            else this.showlist("*All");
+            if (listViewGroups.SelectedItems.Count == 1) showlist(listViewGroups.SelectedItems[0].Text);
+            else showlist("*All");
         }
 
         //set obsolete value
         private void daysToolStripMenuItem2_Click(object sender, EventArgs e)
         {
             secconbl.obsolete = 180.0;
-            if (listViewGroups.SelectedItems.Count == 1) this.showlist(listViewGroups.SelectedItems[0].Text);
-            else this.showlist("*All");
+            if (listViewGroups.SelectedItems.Count == 1) showlist(listViewGroups.SelectedItems[0].Text);
+            else showlist("*All");
         }
 
         //set obsolete value
         private void daysToolStripMenuItem3_Click(object sender, EventArgs e)
         {
             secconbl.obsolete = 360.0;
-            if (listViewGroups.SelectedItems.Count == 1) this.showlist(listViewGroups.SelectedItems[0].Text);
-            else this.showlist("*All");
+            if (listViewGroups.SelectedItems.Count == 1) showlist(listViewGroups.SelectedItems[0].Text);
+            else showlist("*All");
         }
 
         //set obsolete value
@@ -1185,8 +1218,8 @@ namespace SEC2ON
             try
             {
                 secconbl.obsolete = Convert.ToDouble(toolStripTextBox1.Text);
-                if (listViewGroups.SelectedItems.Count == 1) this.showlist(listViewGroups.SelectedItems[0].Text);
-                else this.showlist("*All");
+                if (listViewGroups.SelectedItems.Count == 1) showlist(listViewGroups.SelectedItems[0].Text);
+                else showlist("*All");
             }
             catch { };
         }
@@ -1197,7 +1230,7 @@ namespace SEC2ON
             try { System.Diagnostics.Process.Start(e.LinkText); }
             catch
             {
-                this.updateLog(4, string.Format("Can not open the URL: {0}", e.LinkText));
+                UpdateLog(LoggingType.Error, string.Format("Can not open the URL: {0}", e.LinkText));
             }
         }
 
@@ -1215,7 +1248,7 @@ namespace SEC2ON
         {
             if (listViewAccounts.SelectedItems.Count == 0)
             {
-                this.updateLog(4, string.Format("No item selected."));
+                UpdateLog(LoggingType.Error, string.Format("No item selected."));
                 return;
             }
 
@@ -1233,7 +1266,7 @@ namespace SEC2ON
         {
             if (listViewAccounts.SelectedItems.Count == 0)
             {
-                this.updateLog(4, string.Format("No item selected."));
+                UpdateLog(LoggingType.Error, string.Format("No item selected."));
                 return;
             }
             ArrayList indexes = new ArrayList();
@@ -1249,7 +1282,7 @@ namespace SEC2ON
         {
             if (listViewAccounts.SelectedItems.Count == 0)
             {
-                this.updateLog(4, string.Format("No item selected."));
+                UpdateLog(LoggingType.Error, string.Format("No item selected."));
                 return;
             }
             ArrayList indexes = new ArrayList();
@@ -1275,8 +1308,8 @@ namespace SEC2ON
             secconbl.m_groups.Clear();
             listViewGroups.Clear(); //redundant?
 
-            if (listViewGroups.SelectedItems.Count == 1) this.showlist(listViewGroups.SelectedItems[0].Text);
-            else this.showlist("*All");
+            if (listViewGroups.SelectedItems.Count == 1) showlist(listViewGroups.SelectedItems[0].Text);
+            else showlist("*All");
         }
 
         //disconnect dropbox account - this just means to delete the user token / secretfile 
@@ -1288,11 +1321,11 @@ namespace SEC2ON
             {
                 if (deldbuserfile == DialogResult.Yes)
                     File.Delete(string.Format("dbuser_{0}", System.Security.Principal.WindowsIdentity.GetCurrent().Name.GetHashCode().ToString()));
-                this.updateLog(2, string.Format("Dropbox connection information was deleted."));
+                UpdateLog(LoggingType.Info, string.Format("Dropbox connection information was deleted."));
             }
             catch
             {
-                this.updateLog(4, string.Format("There was an error deleting the dropbox connection information."));
+                UpdateLog(LoggingType.Error, string.Format("There was an error deleting the dropbox connection information."));
             }
         }
 
@@ -1327,8 +1360,8 @@ namespace SEC2ON
             //Do nothing if the column is not sortable
             if (e.Column == 2 || e.Column == 3 || e.Column == 4) return;
 
-            if (listViewGroups.SelectedItems.Count == 1) this.showlist(listViewGroups.SelectedItems[0].Text);
-            else this.showlist("*All");
+            if (listViewGroups.SelectedItems.Count == 1) showlist(listViewGroups.SelectedItems[0].Text);
+            else showlist("*All");
         }
 
         //import items from exported and encrypted file
@@ -1359,7 +1392,7 @@ namespace SEC2ON
             }
             catch
             {
-                this.updateLog(4, string.Format("There was an error opening the file \"" + file + "\"."));
+                UpdateLog(LoggingType.Error, string.Format("There was an error opening the file \"" + file + "\"."));
                 return;
             }
 
@@ -1367,8 +1400,8 @@ namespace SEC2ON
             if (listViewGroups.SelectedItems.Count == 1 && !listViewGroups.SelectedItems[0].Text.Contains("*")) group = listViewGroups.SelectedItems[0].Text;
 
             secconbl.importItems(input, group, imageList2, file);
-            if (listViewGroups.SelectedItems.Count == 1) this.showlist(listViewGroups.SelectedItems[0].Text);
-            else this.showlist("*All");
+            if (listViewGroups.SelectedItems.Count == 1) showlist(listViewGroups.SelectedItems[0].Text);
+            else showlist("*All");
         }
 
         //copy the item to the clipboard
@@ -1376,7 +1409,7 @@ namespace SEC2ON
         {
             if (listViewAccounts.SelectedItems.Count == 0)
             {
-                this.updateLog(4, string.Format("No item selected."));
+                UpdateLog(LoggingType.Error, string.Format("No item selected."));
                 return;
             }
             ArrayList indexes = new ArrayList();
@@ -1398,8 +1431,8 @@ namespace SEC2ON
                 if (listViewGroups.SelectedItems.Count == 1 && !listViewGroups.SelectedItems[0].Text.Contains("*")) group = listViewGroups.SelectedItems[0].Text;
 
                 secconbl.importItems(clipboard, group, imageList2, fromclipboard: true);
-                if (listViewGroups.SelectedItems.Count == 1) this.showlist(listViewGroups.SelectedItems[0].Text);
-                else this.showlist("*All");
+                if (listViewGroups.SelectedItems.Count == 1) showlist(listViewGroups.SelectedItems[0].Text);
+                else showlist("*All");
             }
         }
 
@@ -1435,7 +1468,7 @@ namespace SEC2ON
         //Context menu was enabled / disabled
         private void contextMenuStripentry_EnabledChanged(object sender, EventArgs e)
         {
-            //this.contextMenuEnableItems(SelectedItemType.Item);
+            //contextMenuEnableItems(SelectedItemType.Item);
         }
 
         //Enable / Disable context menu items when context menu is enabled / disabled
@@ -1501,20 +1534,20 @@ namespace SEC2ON
         {
             if (secconbl.Filename != "")
             {
-                if (this.WindowState != FormWindowState.Minimized)
+                if (WindowState != FormWindowState.Minimized)
                 {
 
                     //Check if database is unlocked
                     if (secconbl.PWManager.Locked)
                     {
-                        this.Visible = false;
+                        Visible = false;
                         secconbl.UnlockDB(check: true);
                     }
                     if (secconbl.PWManager.Locked)
                     {
-                        this.WindowState = FormWindowState.Minimized;
+                        WindowState = FormWindowState.Minimized;
                     }
-                    this.Visible = true;
+                    Visible = true;
 
                 }
             }
@@ -1531,8 +1564,8 @@ namespace SEC2ON
             secconbl.m_groups.Clear();
             listViewGroups.Clear(); //redundant?
 
-            if (listViewGroups.SelectedItems.Count == 1) this.showlist(listViewGroups.SelectedItems[0].Text);
-            else this.showlist("*All");
+            if (listViewGroups.SelectedItems.Count == 1) showlist(listViewGroups.SelectedItems[0].Text);
+            else showlist("*All");
         }
 
         //Delete group
@@ -1543,8 +1576,8 @@ namespace SEC2ON
             secconbl.m_groups.Clear();
             listViewGroups.Clear(); //redundant?
 
-            if (listViewGroups.SelectedItems.Count == 1) this.showlist(listViewGroups.SelectedItems[0].Text);
-            else this.showlist("*All");
+            if (listViewGroups.SelectedItems.Count == 1) showlist(listViewGroups.SelectedItems[0].Text);
+            else showlist("*All");
         }
 
         //Edit group definition
@@ -1555,20 +1588,20 @@ namespace SEC2ON
             secconbl.m_groups.Clear();
             listViewGroups.Clear(); //redundant?
 
-            if (listViewGroups.SelectedItems.Count == 1) this.showlist(listViewGroups.SelectedItems[0].Text);
-            else this.showlist("*All");
+            if (listViewGroups.SelectedItems.Count == 1) showlist(listViewGroups.SelectedItems[0].Text);
+            else showlist("*All");
         }
 
         //Move group up
         private void toolStripButtonMoveGroupUp_Click(object sender, EventArgs e)
         {
-            if (listViewGroups.SelectedItems.Count == 1) this.MoveGroup(listViewGroups.SelectedItems[0].Text, SecconBL.MoveDirection.Up);
+            if (listViewGroups.SelectedItems.Count == 1) MoveGroup(listViewGroups.SelectedItems[0].Text, SecconBL.MoveDirection.Up);
         }
 
         //Move group down
         private void toolStripButtonMoveGroupDown_Click(object sender, EventArgs e)
         {
-            if (listViewGroups.SelectedItems.Count == 1) this.MoveGroup(listViewGroups.SelectedItems[0].Text, SecconBL.MoveDirection.Down);
+            if (listViewGroups.SelectedItems.Count == 1) MoveGroup(listViewGroups.SelectedItems[0].Text, SecconBL.MoveDirection.Down);
         }
 
         //Move group
@@ -1579,13 +1612,20 @@ namespace SEC2ON
             secconbl.m_groups.Clear();
             listViewGroups.Clear(); 
 
-            this.showlist(groupname);
+            showlist(groupname);
 
             //select the group in the listview
             foreach (ListViewItem group in listViewGroups.Items)
             {
                 if (group.Text == groupname) group.Selected = true;
             }
+        }
+
+        //show about dlg
+        private void toolStripButton4_Click(object sender, EventArgs e)
+        {
+            AboutDlg about = new AboutDlg();
+            about.ShowDialog();
         }
         #endregion
 
@@ -1599,13 +1639,13 @@ namespace SEC2ON
                 if (secconbl.DBEntries != null)
                 {
                     if (e.Reason == PWHandler.PWHandlerEventArgs.PWHandlerLockReasonEnum.Timeout)
-                        this.updateLog(2, "Database is locked due to timeout.");
+                        UpdateLog(LoggingType.Info, "Database is locked due to timeout.");
                     else if (e.Reason == PWHandler.PWHandlerEventArgs.PWHandlerLockReasonEnum.PinInvalidated)
                     {
                         secconbl.Sessionpinactive = false;
-                        this.updateLog(4, "Wrong pin was entered 3 times. Pin has been invalidated for this session.");
+                        UpdateLog(LoggingType.Error, "Wrong pin was entered 3 times. Pin has been invalidated for this session.");
                     }
-                    else this.updateLog(2, "Database is locked.");
+                    else UpdateLog(LoggingType.Info, "Database is locked.");
 
                     if (!secconbl.Sessionpinactive)
                     {
@@ -1618,11 +1658,11 @@ namespace SEC2ON
                         toolStripOwner.Image = imageListToolStrip.Images[3];
                     }
 
-                    this.WindowState = FormWindowState.Minimized;
+                    WindowState = FormWindowState.Minimized;
                 }
                 else
                 {
-                    this.updateLog(2, "No database opened.");
+                    UpdateLog(LoggingType.Info, "No database opened.");
                     toolStripLockState.Image = imageListToolStrip.Images[0];
                 }
                 textBoxDetails.Text = "";
@@ -1632,19 +1672,19 @@ namespace SEC2ON
             //PW is unlocked
             if (e.Event == PWHandler.PWHandlerEventArgs.PWHandlerEventEnum.UnlockByKey)
             {
-                this.updateLog(2, "Check masterkey and unlock database...");
+                UpdateLog(LoggingType.Info, "Check masterkey and unlock database...");
                 toolStripLockState.Image = imageListToolStrip.Images[1];
 
             }
             if (e.Event == PWHandler.PWHandlerEventArgs.PWHandlerEventEnum.UnlockByPin)
             {
-                this.updateLog(2, "Database is unlocked by session pin.");
+                UpdateLog(LoggingType.Info, "Database is unlocked by session pin.");
                 toolStripLockState.Image = imageListToolStrip.Images[1];
 
             }
 
             //SESSION PIN ENABLED
-            if (e.Reason == PWHandler.PWHandlerEventArgs.PWHandlerLockReasonEnum.PinActivated && e.PinState == true) this.updateLog(2, "A session pin has been enabled for this session.");
+            if (e.Reason == PWHandler.PWHandlerEventArgs.PWHandlerLockReasonEnum.PinActivated && e.PinState == true) UpdateLog(LoggingType.Info, "A session pin has been enabled for this session.");
 
             //PIN
             if (e.PinState == true)
@@ -1675,7 +1715,7 @@ namespace SEC2ON
         {
             if (secconbl.Killclipboardtimerexpired <= 0)
             {                
-                this.updateLog(2, "The content of the clipboard was deleted.");
+                UpdateLog(LoggingType.Info, "The content of the clipboard was deleted.");
                 toolStripProgressBar1.Visible = false;
             }
             else
@@ -1694,10 +1734,6 @@ namespace SEC2ON
 
         #endregion
 
-        private void toolStripButton4_Click(object sender, EventArgs e)
-        {
-            AboutDlg about = new AboutDlg();
-            about.ShowDialog();
-        }
+        
     }
 }

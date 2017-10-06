@@ -117,18 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="TempDBFile" xml:space="preserve">
-    <value>~synctemp.tmp</value>
-  </data>
-  <data name="ExtensionBackup" xml:space="preserve">
-    <value>.sdb_backup</value>
-  </data>
-  <data name="timeToDeleteClipboardSeconds" xml:space="preserve">
-    <value>10</value>
-  </data>
-  <data name="timeOutPasswordHandler" xml:space="preserve">
-    <value>180000</value>
-  </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="elmejor" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Src\icos Program\el-mejor.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

@@ -43,7 +43,7 @@ namespace SEC2ON.LBSecconBusinessLogic
             }
             catch (DropboxException ex)
             {
-                GUI.updateLog(4, String.Format("There was an error while getting a list of available databases: {0}", ex.Message));
+                GUI.UpdateLog(SECCONFORM.LoggingType.Error, String.Format("There was an error while getting a list of available databases: {0}", ex.Message));
                 return;
             }
 
@@ -53,7 +53,7 @@ namespace SEC2ON.LBSecconBusinessLogic
 
             if (selectdb.DialogResult == DialogResult.Cancel)
             {
-                GUI.updateLog(2, "Action cancelled before downloading.");
+                GUI.UpdateLog(SECCONFORM.LoggingType.Info, "Action cancelled before downloading.");
                 return;
             }
 
@@ -66,7 +66,7 @@ namespace SEC2ON.LBSecconBusinessLogic
 
             if (newdbname.ShowDialog() != DialogResult.OK)
             {
-                GUI.updateLog(2, "Action cancelled before downloading.");
+                GUI.UpdateLog(SECCONFORM.LoggingType.Info, "Action cancelled before downloading.");
                 return;
             }
 
@@ -95,7 +95,7 @@ namespace SEC2ON.LBSecconBusinessLogic
             //precondition: check if database is saved
             if (!CheckIfDBIsSavedForSync()) return;
 
-            GUI.updateLog(2, "Wait for dropbox...");
+            GUI.UpdateLog(SECCONFORM.LoggingType.Info, "Wait for dropbox...");
             Application.DoEvents();
             try
             {
@@ -111,18 +111,18 @@ namespace SEC2ON.LBSecconBusinessLogic
                     {
                         if (await dropboxFileOperations(Path.GetFileName(Filename), dropboxFileOperation.Upload))
                         {
-                            GUI.updateLog(2, "There was no version of your database online but a copy was uploaded.");
+                            GUI.UpdateLog(SECCONFORM.LoggingType.Info, "There was no version of your database online but a copy was uploaded.");
                             return;
                         }
                         else
                         {
-                            GUI.updateLog(4, "There was no version of your database online. Uploading a copy of your database failed.");
+                            GUI.UpdateLog(SECCONFORM.LoggingType.Error, "There was no version of your database online. Uploading a copy of your database failed.");
                             return;
                         }
                     }
                     else
                     {
-                        GUI.updateLog(2, "There was no version of your database online, action was cancelled.");
+                        GUI.UpdateLog(SECCONFORM.LoggingType.Info, "There was no version of your database online, action was cancelled.");
                         return;
                     }
 
@@ -130,17 +130,17 @@ namespace SEC2ON.LBSecconBusinessLogic
             }
             catch (Exception ex)
             {
-                GUI.updateLog(4, string.Format("There was an error while login to your dropbox: {0}", ex.Message));
+                GUI.UpdateLog(SECCONFORM.LoggingType.Error, string.Format("There was an error while login to your dropbox: {0}", ex.Message));
                 return;
             }
 
             //All preconditions are meeting - begin to synchronize with online version
-            GUI.updateLog(5, string.Format("Synchronizing database..."));
+            GUI.UpdateLog(SECCONFORM.LoggingType.Synchronize, string.Format("Synchronizing database..."));
 
             Application.DoEvents();
 
             //store a temporary copy of the dropbox version locally
-            if (!await dropboxFileOperations(Path.GetFileName(Filename), Path.Combine(Application.LocalUserAppDataPath, Properties.Resources.TempDBFile), dropboxFileOperation.Download))
+            if (!await dropboxFileOperations(Path.GetFileName(Filename), Path.Combine(Application.LocalUserAppDataPath, Properties.Settings.Default.TempDBFile), dropboxFileOperation.Download))
             {
                 return;
             }
@@ -148,16 +148,16 @@ namespace SEC2ON.LBSecconBusinessLogic
             // BEGIN OF SYNCHRONIZATION
             int updated = 0;
             int updatedpgp = 0;
-            SynchronizeDatabasesResult result = this.synchronizeDatabases(Path.Combine(Application.LocalUserAppDataPath, Properties.Resources.TempDBFile), ref updated, ref updatedpgp);
+            SynchronizeDatabasesResult result = this.synchronizeDatabases(Path.Combine(Application.LocalUserAppDataPath, Properties.Settings.Default.TempDBFile), ref updated, ref updatedpgp);
             if (result == SynchronizeDatabasesResult.OverwriteTarget)
             {
                 if (await dropboxFileOperations(Path.GetFileName(Filename), dropboxFileOperation.Upload))
                 {
-                    GUI.updateLog(2, "The online version of the database was overwritten by the local database. A backup copy was created on the dropbox.");
+                    GUI.UpdateLog(SECCONFORM.LoggingType.Info, "The online version of the database was overwritten by the local database. A backup copy was created on the dropbox.");
                     return;
                 }
                 else
-                    GUI.updateLog(4, "While uploading the database something went wrong.");
+                    GUI.UpdateLog(SECCONFORM.LoggingType.Error, "While uploading the database something went wrong.");
                 return;
             }
             if (result == SynchronizeDatabasesResult.Cancelled)
@@ -165,16 +165,16 @@ namespace SEC2ON.LBSecconBusinessLogic
             // END OF SYNCHRONIZATION
 
             //delete the temporary database
-            File.Delete(Path.Combine(Application.LocalUserAppDataPath, Properties.Resources.TempDBFile));
+            File.Delete(Path.Combine(Application.LocalUserAppDataPath, Properties.Settings.Default.TempDBFile));
 
             //Save the local database and upload a copy to the dropbox
             if (!this.savedatabase())
             {
-                GUI.updateLog(4, string.Format("Cannot save the databse locally. The database on your dropbox keeps untouched. Please try again.", updated, updatedpgp));
+                GUI.UpdateLog(SECCONFORM.LoggingType.Error, string.Format("Cannot save the databse locally. The database on your dropbox keeps untouched. Please try again.", updated, updatedpgp));
                 return;
             }
 
-            GUI.updateLog(5, string.Format("Upload database..."));
+            GUI.UpdateLog(SECCONFORM.LoggingType.Synchronize, string.Format("Upload database..."));
 
             Application.DoEvents();
 
@@ -186,10 +186,10 @@ namespace SEC2ON.LBSecconBusinessLogic
             }
 
             //Report if there were updated items
-            if (updated == 0 && updatedpgp == 0) GUI.updateLog(2, string.Format("The local database is up to date.", updated, updatedpgp));
-            if (updated > 0 && updatedpgp == 0) GUI.updateLog(2, string.Format("Updated items: {0}", updated, updatedpgp));
-            if (updated == 0 && updatedpgp > 0) GUI.updateLog(2, string.Format("Updated PGP-Keys: {1}", updated, updatedpgp));
-            if (updated > 0 && updatedpgp > 0) GUI.updateLog(2, string.Format("Updated items: {0}, updated PGP-Keys: {1}", updated, updatedpgp));
+            if (updated == 0 && updatedpgp == 0) GUI.UpdateLog(SECCONFORM.LoggingType.Info, string.Format("The local database is up to date.", updated, updatedpgp));
+            if (updated > 0 && updatedpgp == 0) GUI.UpdateLog(SECCONFORM.LoggingType.Info, string.Format("Updated items: {0}", updated, updatedpgp));
+            if (updated == 0 && updatedpgp > 0) GUI.UpdateLog(SECCONFORM.LoggingType.Info, string.Format("Updated PGP-Keys: {1}", updated, updatedpgp));
+            if (updated > 0 && updatedpgp > 0) GUI.UpdateLog(SECCONFORM.LoggingType.Info, string.Format("Updated items: {0}, updated PGP-Keys: {1}", updated, updatedpgp));
         }
 
         //Check if dropbox is connected, if not start connecting process
@@ -198,10 +198,10 @@ namespace SEC2ON.LBSecconBusinessLogic
             if (!this.dropboxLoadUserLogin())
             {
                 //login to dropbox is needed first
-                GUI.updateLog(3, "Dropbox not connected, must be connected first...");
+                GUI.UpdateLog(SECCONFORM.LoggingType.Warning, "Dropbox not connected, must be connected first...");
                 if (!this.dropboxAuthentification())
                 {
-                    GUI.updateLog(4, "Dropbox not connected. Action was cancelled or an error occured.");
+                    GUI.UpdateLog(SECCONFORM.LoggingType.Error, "Dropbox not connected. Action was cancelled or an error occured.");
                     return false;
                 }
             }
@@ -234,7 +234,7 @@ namespace SEC2ON.LBSecconBusinessLogic
                         }
                         catch (DropboxException ex)
                         {
-                            GUI.updateLog(4, string.Format("Cannot delete online database: {0}", ex.Message));
+                            GUI.UpdateLog(SECCONFORM.LoggingType.Error, string.Format("Cannot delete online database: {0}", ex.Message));
                             return false;
                         }
                     }
@@ -248,7 +248,7 @@ namespace SEC2ON.LBSecconBusinessLogic
                 {
                     if (dbname == destname)
                     {
-                        GUI.updateLog(4, string.Format("Source and destination filenames are equal. This is a program error!"));
+                        GUI.UpdateLog(SECCONFORM.LoggingType.Error, string.Format("Source and destination filenames are equal. This is a program error!"));
                         return false;
                     }
                     try
@@ -257,7 +257,7 @@ namespace SEC2ON.LBSecconBusinessLogic
                     }
                     catch (DropboxException ex)
                     {
-                        GUI.updateLog(4, string.Format("Cannot make a backup of the database: {0}", ex.Message));
+                        GUI.UpdateLog(SECCONFORM.LoggingType.Error, string.Format("Cannot make a backup of the database: {0}", ex.Message));
                         return false;
                     }
                     return true;
@@ -281,12 +281,12 @@ namespace SEC2ON.LBSecconBusinessLogic
                     }
                     catch (DropboxException ex)
                     {
-                        GUI.updateLog(4, string.Format("There was an error downloading the database: {0}", ex.Message));
+                        GUI.UpdateLog(SECCONFORM.LoggingType.Error, string.Format("There was an error downloading the database: {0}", ex.Message));
                         return false;
                     }
                     catch (Exception ex)
                     {
-                        GUI.updateLog(4, string.Format("There was an error saving the database locally: {0}", ex.Message));
+                        GUI.UpdateLog(SECCONFORM.LoggingType.Error, string.Format("There was an error saving the database locally: {0}", ex.Message));
                         return false;
                     }
                     return true;
@@ -304,7 +304,7 @@ namespace SEC2ON.LBSecconBusinessLogic
 
                     if (m.Entries.Any(c => c.IsFile && c.Name == Path.GetFileName(dbname)))
                     {
-                        string backupFileName = Path.GetFileName(dbname).Replace(".sdb", Properties.Resources.ExtensionBackup);
+                        string backupFileName = Path.GetFileName(dbname).Replace(".sdb", Properties.Settings.Default.ExtensionBackup);
 
                         bool deletebackup = await dropboxFileOperations(backupFileName, dropboxFileOperation.Delete);
                         bool copydatabase = await dropboxFileOperations(Path.GetFileName(dbname), backupFileName, dropboxFileOperation.Copy);
@@ -331,12 +331,12 @@ namespace SEC2ON.LBSecconBusinessLogic
                     }
                     catch (DropboxException ex)
                     {
-                        GUI.updateLog(4, string.Format("There was an error uploading the database: {0}", ex.Message));
+                        GUI.UpdateLog(SECCONFORM.LoggingType.Error, string.Format("There was an error uploading the database: {0}", ex.Message));
                         return false;
                     }
                     catch
                     {
-                        GUI.updateLog(4, string.Format("There was an error accessing the dropbox database locally."));
+                        GUI.UpdateLog(SECCONFORM.LoggingType.Error, string.Format("There was an error accessing the dropbox database locally."));
                         return false;
                     }
                     return true;
@@ -345,16 +345,16 @@ namespace SEC2ON.LBSecconBusinessLogic
             }
             catch (DropboxException ex)
             {
-                GUI.updateLog(4, string.Format("There was an error while accessing your dropbox: {0}", ex.Message));
+                GUI.UpdateLog(SECCONFORM.LoggingType.Error, string.Format("There was an error while accessing your dropbox: {0}", ex.Message));
                 return false;
             }
             catch (Exception ex)
             {
-                GUI.updateLog(4, string.Format("There was an error while login to your dropbox: {0}", ex.Message));
+                GUI.UpdateLog(SECCONFORM.LoggingType.Error, string.Format("There was an error while login to your dropbox: {0}", ex.Message));
                 return false;
             }
 
-            GUI.updateLog(4, "dropboxFileOperations was called with an unknown action... internal error - check program.");
+            GUI.UpdateLog(SECCONFORM.LoggingType.Error, "dropboxFileOperations was called with an unknown action... internal error - check program.");
             return false;
         }
 
@@ -399,7 +399,7 @@ namespace SEC2ON.LBSecconBusinessLogic
                 if (login.Result)
                 {
                     dropboxStoreLogin(login.AccessToken, login.Uid);
-                    GUI.updateLog(2, string.Format("Dropbox connected succesfully."));
+                    GUI.UpdateLog(SECCONFORM.LoggingType.Info, string.Format("Dropbox connected succesfully."));
                     return true;
                 }
                 else
@@ -407,12 +407,12 @@ namespace SEC2ON.LBSecconBusinessLogic
             }
             catch (DropboxException ex)
             {
-                GUI.updateLog(4, string.Format("There was an error while login to your dropbox: {0}", ex.Message));
+                GUI.UpdateLog(SECCONFORM.LoggingType.Error, string.Format("There was an error while login to your dropbox: {0}", ex.Message));
                 return false;
             }
             catch (Exception ex)
             {
-                GUI.updateLog(4, string.Format("There was an error while login to your dropbox: {0}", ex.Message));
+                GUI.UpdateLog(SECCONFORM.LoggingType.Error, string.Format("There was an error while login to your dropbox: {0}", ex.Message));
                 return false;
             }
         }

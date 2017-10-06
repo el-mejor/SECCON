@@ -19,7 +19,7 @@ namespace SEC2ON.LBSecconBusinessLogic
         #region properties        
 
         public SECCONFORM GUI = null;
-        public PWHandler PWManager = new PWHandler(Convert.ToInt32(Properties.Resources.timeOutPasswordHandler)); //Passwordhandler
+        public PWHandler PWManager = new PWHandler(Convert.ToInt32(Properties.Settings.Default.timeOutPasswordHandler)); //Passwordhandler
         public WatchChanges WatchChangesDB = new WatchChanges(); //Was the database modified?
         public List<SecItem> DBEntries = new List<SecItem>(); //Collection of all items
         public List<SecItem> DBGroups = new List<SecItem>(); //Collection of all group items
@@ -33,9 +33,9 @@ namespace SEC2ON.LBSecconBusinessLogic
         
         public bool HighLightPasswordAge {get; set;}
 
-        public Boolean Sessionpinactive { get; set; }
+        public bool Sessionpinactive { get; set; }
 
-        public Boolean ShowUserNameIsActive
+        public bool ShowUserNameIsActive
         { get { return m_showlogins; } set { m_showlogins = value; } }
 
         public bool DetailsView {get; set;}
@@ -49,7 +49,7 @@ namespace SEC2ON.LBSecconBusinessLogic
 
         #region fields        
         private DateTime m_lastsync = DateTime.MinValue;
-        private Boolean m_showlogins = true;
+        private bool m_showlogins = true;
         #endregion
 
         #region ctor
@@ -76,7 +76,7 @@ namespace SEC2ON.LBSecconBusinessLogic
         public void CreateNewDatabase()
         {
             //Close the current database, abort if there are unsaved changes
-            if (!this.closeDatabase()) return;
+            if (!closeDatabase()) return;
 
             //Select file to create
             SaveFileDialog newdbname = new SaveFileDialog();
@@ -112,21 +112,21 @@ namespace SEC2ON.LBSecconBusinessLogic
                 try
                 {
                     savedb.Write(encxml);
-                    GUI.updateLog(2, "DB was saved succesfully.");
+                    GUI.UpdateLog(SECCONFORM.LoggingType.Info, "Database created succesfully.");
                 }
                 catch
                 {
                     DialogResult dlg = MessageBox.Show("There was an error saving the database. Please try again or save it in a new file.", "Save...", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    GUI.updateLog(4, "There was an error saving the database.");
+                    GUI.UpdateLog(SECCONFORM.LoggingType.Error, "There was an error saving the database.");
                 }
             }
 
             //open new database
-            this.open_database(Filename);
+            open_database(Filename);
         }
 
         //open database
-        public Boolean open_database(string filename)
+        public bool open_database(string filename)
         {
             //get new filename (either it is predefined or by open file dialog)
             Filename = filename;
@@ -148,9 +148,9 @@ namespace SEC2ON.LBSecconBusinessLogic
             while (!done)
             {
                 //ask for password
-                if (!this.UnlockDB())
+                if (!UnlockDB())
                 {
-                    this.closeDatabase();
+                    closeDatabase();
                     return false; //if it was not possible to unlock the pwm (cancel was hit in password dialog) return
                 }
 
@@ -180,7 +180,7 @@ namespace SEC2ON.LBSecconBusinessLogic
                 catch
                 {
                     PWManager.Lock(PWHandler.PWHandlerEventArgs.PWHandlerLockReasonEnum.WrongPW);
-                    GUI.updateLog(4, "Wrong masterkey. No database opened.");
+                    GUI.UpdateLog(SECCONFORM.LoggingType.Error, "Wrong masterkey. No database opened.");
 
 
                     DialogResult res = MessageBox.Show(string.Format("Wrong master key entered. Reenter key?"), "Open database...", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
@@ -204,8 +204,8 @@ namespace SEC2ON.LBSecconBusinessLogic
             obsolete = openDB.MarkAsObsolete;
             m_lastsync = openDB.LastSync;
 
-            if (m_lastsync == DateTime.MinValue) GUI.updateLog(2, Path.GetFileName(Filename) + " loaded succesfully.");
-            else GUI.updateLog(2, Path.GetFileName(Filename) + " loaded succesfully. Last synchronization: " + m_lastsync.ToString());
+            if (m_lastsync == DateTime.MinValue) GUI.UpdateLog(SECCONFORM.LoggingType.Info, Path.GetFileName(Filename) + " loaded succesfully.");
+            else GUI.UpdateLog(SECCONFORM.LoggingType.Info, Path.GetFileName(Filename) + " loaded succesfully. Last synchronization: " + m_lastsync.ToString());
             GUI.Text = Path.GetFileName(Filename) + " - SECCON";
 
             
@@ -226,7 +226,7 @@ namespace SEC2ON.LBSecconBusinessLogic
             if (openDB.UpdatedItems > 0)
             {
                 WatchChangesDB.Changed = true;
-                GUI.updateLog(2, string.Format("MAINTENANCE: {0} values have been updated.", openDB.UpdatedItems));
+                GUI.UpdateLog(SECCONFORM.LoggingType.Info, string.Format("MAINTENANCE: {0} values have been updated.", openDB.UpdatedItems));
             }
 
             openDB = null;
@@ -253,7 +253,7 @@ namespace SEC2ON.LBSecconBusinessLogic
             }
 
             //Check if database is unlocked, cancel operation if unlocking was not possible (wrong password)
-            if (!this.UnlockDB(check: true)) return false;
+            if (!UnlockDB(check: true)) return false;
             
             //save settings
             xmldoc.ShowUserNameIsActive = ShowUserNameIsActive;
@@ -312,25 +312,25 @@ namespace SEC2ON.LBSecconBusinessLogic
                     byte[] checkhash = hash.ComputeHash(Encoding.UTF8.GetBytes(checkdb.ReadToEnd()));
                     if (Convert.ToBase64String(filehash) != Convert.ToBase64String(checkhash))
                     {
-                        GUI.updateLog(4, string.Format("Verifying of database failed.", Convert.ToBase64String(filehash), Convert.ToBase64String(checkhash)));
+                        GUI.UpdateLog(SECCONFORM.LoggingType.Error, string.Format("Verifying of database failed.", Convert.ToBase64String(filehash), Convert.ToBase64String(checkhash)));
 
                         DialogResult dlg = MessageBox.Show("There was an error saving the database. Please try again or save it in a new file.", "Save...", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return false;
                     }
                     
-                    GUI.updateLog(2, "Database was saved succesfully.");
+                    GUI.UpdateLog(SECCONFORM.LoggingType.Info, "Database was saved succesfully.");
 
                     WatchChangesDB.Changed = false;
 
                     //if the database was saved into a new file open it now
-                    if (saveasnewfile) this.open_database(Filename);
+                    if (saveasnewfile) open_database(Filename);
                 }
             }
             catch
             {
                 DialogResult dlg = MessageBox.Show("There was an error saving the database. Please try again or save it in a new file.", "Save...", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                GUI.updateLog(4, "There was an error saving the database!");
+                GUI.UpdateLog(SECCONFORM.LoggingType.Error, "There was an error saving the database!");
 
                 return false;
             }
@@ -347,7 +347,7 @@ namespace SEC2ON.LBSecconBusinessLogic
                 if (dlg == DialogResult.Cancel) return false;
                 if (dlg == DialogResult.Yes)
                 {
-                    this.savedatabase();
+                    savedatabase();
                 }
             }
 
@@ -390,7 +390,7 @@ namespace SEC2ON.LBSecconBusinessLogic
                         if (!pwh.Locked) return true;
                         else if (pwh.WrongPinCount > 0)
                         {
-                            GUI.updateLog(3, "Wrong pin. Please try again.");
+                            GUI.UpdateLog(SECCONFORM.LoggingType.Warning, "Wrong pin. Please try again.");
                         }
                     }
                     else
@@ -436,13 +436,13 @@ namespace SEC2ON.LBSecconBusinessLogic
                 if (pwh.PWHash != Currenthash)
                 {
                     pwh.Lock(PWHandler.PWHandlerEventArgs.PWHandlerLockReasonEnum.WrongPW);
-                    GUI.updateLog(4, "Wrong masterkey. Please try again.");
+                    GUI.UpdateLog(SECCONFORM.LoggingType.Error, "Wrong masterkey. Please try again.");
 
                     return false;
                 }
                 else
                 {
-                    GUI.updateLog(2, "Masterkey accepted, database is unlocked.");
+                    GUI.UpdateLog(SECCONFORM.LoggingType.Info, "Masterkey accepted, database is unlocked.");
                 }
             }
             return true;
@@ -457,10 +457,10 @@ namespace SEC2ON.LBSecconBusinessLogic
                 DialogResult notsaved = MessageBox.Show("There are unsaved changes in your database. Would you like to save them?", "Synchronize databases...", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
                 if (notsaved == DialogResult.No)
                 {
-                    GUI.updateLog(4, "To synchronize the database you need to save it first.");
+                    GUI.UpdateLog(SECCONFORM.LoggingType.Error, "To synchronize the database you need to save it first.");
                     return false;
                 }
-                if (!this.savedatabase()) return false;
+                if (!savedatabase()) return false;
             }
             return true;
         }
@@ -469,7 +469,7 @@ namespace SEC2ON.LBSecconBusinessLogic
         public void addEmptyItem(SecItem.ItemType itemtype, List<SecItem> DB, String selectedgroup, ImageList imageList2)
         {
             //check if database is unlocked
-            if (!this.UnlockDB(check: true)) return;
+            if (!UnlockDB(check: true)) return;
 
             //add new empty item
             SecDB xmldoc = new SecDB();
@@ -503,12 +503,12 @@ namespace SEC2ON.LBSecconBusinessLogic
                 if (selectedgroup != "") newentry.Group = selectedgroup;
             }
 
-            this.addItem(newentry, itemtype, DB, imageList2);
+            addItem(newentry, itemtype, DB, imageList2);
 
             if (itemtype == SecItem.ItemType.Group)
             {
                 m_groups.Clear();                
-                this.RenumberGroupPosition();
+                RenumberGroupPosition();
             }
 
             
@@ -518,7 +518,7 @@ namespace SEC2ON.LBSecconBusinessLogic
         public bool addItem(SecItem newentry, SecItem.ItemType itemtype, List<SecItem> DB, ImageList imageList2, bool suppresseditdialog = false)
         {
             //check if database is unlocked
-            if(!this.UnlockDB(check: true)) return false;            
+            if(!UnlockDB(check: true)) return false;            
 
             SecDB xmldoc = new SecDB();
 
@@ -553,8 +553,8 @@ namespace SEC2ON.LBSecconBusinessLogic
             }
 
             WatchChangesDB.Changed = true;
-            if (itemtype == SecItem.ItemType.Item) GUI.updateLog(2, "New item was added.");
-            if (itemtype == SecItem.ItemType.Group) GUI.updateLog(2, "New group was added.");
+            if (itemtype == SecItem.ItemType.Item) GUI.UpdateLog(SECCONFORM.LoggingType.Info, "New item was added.");
+            if (itemtype == SecItem.ItemType.Group) GUI.UpdateLog(SECCONFORM.LoggingType.Info, "New group was added.");
 
             return true;
         }
@@ -563,7 +563,7 @@ namespace SEC2ON.LBSecconBusinessLogic
         public void editentry(int index, ImageList imageList2)
         {
             //log entry that an item was opened
-            GUI.updateLog(2, string.Format("Item \"{0}\" opened for edit.", DBEntries[index].Name), true, Color.Black, Color.Yellow);
+            GUI.UpdateLog(SECCONFORM.LoggingType.Info, string.Format("Item \"{0}\" opened for edit.", DBEntries[index].Name), true, Color.Black, Color.Yellow);
 
             //open the form
             Editentry edititem = new Editentry();
@@ -608,7 +608,7 @@ namespace SEC2ON.LBSecconBusinessLogic
             {
                 //delete item(s)
                 //DBEntries.RemoveAt(Convert.ToInt16(listViewAccounts.SelectedItems[0].Name));
-                if (!this.UnlockDB(check: true)) return;
+                if (!UnlockDB(check: true)) return;
 
                 //Ask if the item shall really be deleted / all selected items shall be deleted 
                 if (indexes.Count == 1 && !deleteAll)
@@ -629,12 +629,12 @@ namespace SEC2ON.LBSecconBusinessLogic
                 
                 deleteCount++;
 
-                GUI.updateLog(2, string.Format("Item \"{0}\" has been deleted.", DBEntries[index].Name));
+                GUI.UpdateLog(SECCONFORM.LoggingType.Info, string.Format("Item \"{0}\" has been deleted.", DBEntries[index].Name));
 
                 WatchChangesDB.Changed = true;
             }
 
-            if (deleteAll) GUI.updateLog(2, string.Format("{0} Items have been deleted.", deleteCount));
+            if (deleteAll) GUI.UpdateLog(SECCONFORM.LoggingType.Info, string.Format("{0} Items have been deleted.", deleteCount));
 
 
         }
@@ -661,7 +661,7 @@ namespace SEC2ON.LBSecconBusinessLogic
             if (Filename != "")
             {
                 //check if database is unlocked
-                if (!this.UnlockDB(check: true)) return;
+                if (!UnlockDB(check: true)) return;
 
                 while (!checkpwdone)
                 {
@@ -682,7 +682,7 @@ namespace SEC2ON.LBSecconBusinessLogic
                         DateTime.Now.AddYears(9999 - DateTime.Now.Year));
 
                     //Add the item and show the edit item dialog
-                    if (!this.addItem(newentry, SecItem.ItemType.Item, DBEntries, imageList2))
+                    if (!addItem(newentry, SecItem.ItemType.Item, DBEntries, imageList2))
                     {   
                         return;
                     }
@@ -746,7 +746,7 @@ namespace SEC2ON.LBSecconBusinessLogic
                 MemoryStream f = new MemoryStream();
                 MemoryStream h = new MemoryStream();
 
-                GUI.updateLog(5, string.Format("Encryption of \"{0}\" in progress... ({1}/{2})", Path.GetFileName(singlefile), i, files.Length));
+                GUI.UpdateLog(SECCONFORM.LoggingType.Synchronize, string.Format("Encryption of \"{0}\" in progress... ({1}/{2})", Path.GetFileName(singlefile), i, files.Length));
 
                 Application.DoEvents();
                 SHA256 sha = new SHA256Managed();
@@ -779,7 +779,7 @@ namespace SEC2ON.LBSecconBusinessLogic
                     if (Convert.ToBase64String(hashsrc) != Convert.ToBase64String(hashenc))
                     {
                         //hashes are not equal, claim and count errors
-                        GUI.updateLog(4, string.Format("Verifying of \"{0}\" failed.", Path.GetFileName(singlefile)));
+                        GUI.UpdateLog(SECCONFORM.LoggingType.Error, string.Format("Verifying of \"{0}\" failed.", Path.GetFileName(singlefile)));
 
                         DialogResult res = MessageBox.Show(string.Format("Verification \"{0}\" failed.", Path.GetFileName(singlefile)), "Encrypting file...", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         if (files.Length == 1 && Filename != "")
@@ -792,7 +792,7 @@ namespace SEC2ON.LBSecconBusinessLogic
                 //}
                 //catch
                 //{
-                //    GUI.updateLog(4, string.Format("Encryption of \"{0}\" failed.", Path.GetFileName(singlefile)));
+                //    GUI.UpdateLog(SECCONFORM.LoggingType.Error, string.Format("Encryption of \"{0}\" failed.", Path.GetFileName(singlefile)));
 
                 //    DialogResult res = MessageBox.Show(string.Format("Something went wrong, encryption of \"{0}\" failed.", Path.GetFileName(singlefile)), "Encrypting file...", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 //    if (files.Length == 1)
@@ -812,15 +812,15 @@ namespace SEC2ON.LBSecconBusinessLogic
             //show ready message
             if (err > 0 && files.Length > 1)
             {
-                GUI.updateLog(4, string.Format("Encryption of {0} file(s) out of {1} failed.", err, files.Length));
+                GUI.UpdateLog(SECCONFORM.LoggingType.Error, string.Format("Encryption of {0} file(s) out of {1} failed.", err, files.Length));
             }
             else if (files.Length == 1)
             {
-                GUI.updateLog(2, string.Format("Encryption of \"{0}\" finished.", Path.GetFileName(files[0])));
+                GUI.UpdateLog(SECCONFORM.LoggingType.Info, string.Format("Encryption of \"{0}\" finished.", Path.GetFileName(files[0])));
             }
             else if (i == files.Length)
             {
-                GUI.updateLog(2, string.Format("Encryption of {0} files finished.", files.Length));
+                GUI.UpdateLog(SECCONFORM.LoggingType.Info, string.Format("Encryption of {0} files finished.", files.Length));
             }
             toolStripProgressBar1.Visible = false;
 
@@ -875,7 +875,7 @@ namespace SEC2ON.LBSecconBusinessLogic
                     filepw.UnlockPin(pin);
 
                     //decrypt file and save it
-                    GUI.updateLog(5, string.Format("Decryption of \"{0}\" ({1}/{2}) in progress...", Path.GetFileName(file), i, files.Length));
+                    GUI.UpdateLog(SECCONFORM.LoggingType.Synchronize, string.Format("Decryption of \"{0}\" ({1}/{2}) in progress...", Path.GetFileName(file), i, files.Length));
 
                     Application.DoEvents();
                     newfilename = file.Replace(Path.GetExtension(file), "");
@@ -904,12 +904,12 @@ namespace SEC2ON.LBSecconBusinessLogic
                             output = null;
                         }
 
-                        GUI.updateLog(2, string.Format("Decryption of \"{0}\" finished.", Path.GetFileName(file)));
+                        GUI.UpdateLog(SECCONFORM.LoggingType.Info, string.Format("Decryption of \"{0}\" finished.", Path.GetFileName(file)));
                     }
                     //catch when the decryption failed
                     catch (System.Security.Cryptography.CryptographicException)
                     {
-                        GUI.updateLog(4, string.Format("Decryption of \"{0}\" failed.", Path.GetFileName(file)));
+                        GUI.UpdateLog(SECCONFORM.LoggingType.Error, string.Format("Decryption of \"{0}\" failed.", Path.GetFileName(file)));
                         try { File.Delete(newfilename); }
                         catch { }
 
@@ -945,7 +945,7 @@ namespace SEC2ON.LBSecconBusinessLogic
                     //catch that something went wrong while decryption
                     catch
                     {
-                        GUI.updateLog(4, string.Format("Decryption of \"{0}\" failed.", Path.GetFileName(file)));
+                        GUI.UpdateLog(SECCONFORM.LoggingType.Error, string.Format("Decryption of \"{0}\" failed.", Path.GetFileName(file)));
 
                         try { File.Delete(newfilename); }
                         catch { }
@@ -968,15 +968,15 @@ namespace SEC2ON.LBSecconBusinessLogic
                 //show ready message
                 if (err > 0 && files.Length > 1)
                 {
-                    GUI.updateLog(4, string.Format("Decryption of {0} file(s) out of {1} failed.", err, files.Length));
+                    GUI.UpdateLog(SECCONFORM.LoggingType.Error, string.Format("Decryption of {0} file(s) out of {1} failed.", err, files.Length));
                 }
                 else if (files.Length == 1)
                 {
-                    GUI.updateLog(2, string.Format("Decryption of \"{0}\" finished.", Path.GetFileName(files[0])));
+                    GUI.UpdateLog(SECCONFORM.LoggingType.Info, string.Format("Decryption of \"{0}\" finished.", Path.GetFileName(files[0])));
                 }
                 else if (i == files.Length)
                 {
-                    GUI.updateLog(2, string.Format("Decryption of {0} files finished.", files.Length));
+                    GUI.UpdateLog(SECCONFORM.LoggingType.Info, string.Format("Decryption of {0} files finished.", files.Length));
                 }
 
 
@@ -986,12 +986,12 @@ namespace SEC2ON.LBSecconBusinessLogic
 
             if (files.Length > 1 && err > 0)
             {
-                GUI.updateLog(4, string.Format("Decryption of {0} files failed.", err));
+                GUI.UpdateLog(SECCONFORM.LoggingType.Error, string.Format("Decryption of {0} files failed.", err));
 
             }
             else if (files.Length > 1)
             {
-                GUI.updateLog(2, string.Format("Decryption of {0} files finished.", files.Length));
+                GUI.UpdateLog(SECCONFORM.LoggingType.Info, string.Format("Decryption of {0} files finished.", files.Length));
 
             }
 
@@ -1009,7 +1009,7 @@ namespace SEC2ON.LBSecconBusinessLogic
                     }
                     catch
                     {
-                        GUI.updateLog(4, string.Format("Can not open the file: {0}", newfilename));
+                        GUI.UpdateLog(SECCONFORM.LoggingType.Error, string.Format("Can not open the file: {0}", newfilename));
 
                         DialogResult __res = MessageBox.Show("Can not open the file.", "Decrypting file...", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
@@ -1071,7 +1071,7 @@ namespace SEC2ON.LBSecconBusinessLogic
         public void exportItem(ArrayList indexes, exportItemsEncryption encryption)
         {
             //check if database is unlocked
-            if (!this.UnlockDB(check: true)) return;
+            if (!UnlockDB(check: true)) return;
 
             //create string
             MemoryStream exportstream = new MemoryStream();
@@ -1119,7 +1119,7 @@ namespace SEC2ON.LBSecconBusinessLogic
                     exportstream.WriteTo(exportfile);
                 }
 
-                GUI.updateLog(3, string.Format("Selected item(s) were exported UNENCRYPTED(!) to: \"{0}\"", exportfilename, Color.Black, Color.Yellow));
+                GUI.UpdateLog(SECCONFORM.LoggingType.Warning, string.Format("Selected item(s) were exported UNENCRYPTED(!) to: \"{0}\"", exportfilename, Color.Black, Color.Yellow));
                 return;
             }
             if (encryption == exportItemsEncryption.AES)
@@ -1148,7 +1148,7 @@ namespace SEC2ON.LBSecconBusinessLogic
                     output = null;
                 }
 
-                GUI.updateLog(2, string.Format("Selected item(s) were encrypted and exported to: \"{0}\"", exportfilename, Color.Black, Color.Yellow));
+                GUI.UpdateLog(SECCONFORM.LoggingType.Info, string.Format("Selected item(s) were encrypted and exported to: \"{0}\"", exportfilename, Color.Black, Color.Yellow));
                 return;
             }
             if (encryption == exportItemsEncryption.AESClipboard)
@@ -1186,7 +1186,7 @@ namespace SEC2ON.LBSecconBusinessLogic
 
                 cryptoservice.PGPencrypt(Encoding.Unicode.GetString(exportstream.GetBuffer()), keystring, exportfilename);
 
-                GUI.updateLog(2, string.Format("Selected item(s) were PGP-encrypted and exported to: \"{0}\"", exportfilename, Color.Black, Color.Yellow));
+                GUI.UpdateLog(SECCONFORM.LoggingType.Info, string.Format("Selected item(s) were PGP-encrypted and exported to: \"{0}\"", exportfilename, Color.Black, Color.Yellow));
                 return;
             }
         }
@@ -1195,7 +1195,7 @@ namespace SEC2ON.LBSecconBusinessLogic
         public void SynchronizeWithOtherDB()
         {
             //precondition: check if database is unlocked
-            if (!this.UnlockDB(check: true)) return;
+            if (!UnlockDB(check: true)) return;
 
             //precondition: check if database is saved
             if (!CheckIfDBIsSavedForSync()) return;
@@ -1213,12 +1213,12 @@ namespace SEC2ON.LBSecconBusinessLogic
             {
                 //claim that target and current database must not be the same
                 DialogResult res = MessageBox.Show("Current and target database must not be the same!", "Synchronizing...", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                GUI.updateLog(4, "Current and target database must not be the same!");
+                GUI.UpdateLog(SECCONFORM.LoggingType.Error, "Current and target database must not be the same!");
                 return;
             }
 
             //Precondition: make backup
-            string backup = targetdb.Replace(".sdb", Properties.Resources.ExtensionBackup);
+            string backup = targetdb.Replace(".sdb", Properties.Settings.Default.ExtensionBackup);
             try
             {
                 if (File.Exists(backup)) File.Delete(backup);
@@ -1226,14 +1226,14 @@ namespace SEC2ON.LBSecconBusinessLogic
             }
             catch
             {
-                GUI.updateLog(4, "Making a backup of the target database failed.");
+                GUI.UpdateLog(SECCONFORM.LoggingType.Error, "Making a backup of the target database failed.");
                 return;
             }
 
             //BEGIN SYNCHRONIZE
             int updated = 0;
             int updatedpgp = 0;
-            SynchronizeDatabasesResult synchresult = this.synchronizeDatabases(targetdb, ref updated, ref updatedpgp);
+            SynchronizeDatabasesResult synchresult = synchronizeDatabases(targetdb, ref updated, ref updatedpgp);
             if (synchresult == SynchronizeDatabasesResult.Error || synchresult == SynchronizeDatabasesResult.Cancelled)
                 return;
             if (synchresult == SynchronizeDatabasesResult.OverwriteTarget)
@@ -1245,16 +1245,16 @@ namespace SEC2ON.LBSecconBusinessLogic
                 }
                 catch
                 {
-                    GUI.updateLog(4, "Overwriting the target database failed. Maybe it's in use by another process or it is write protected.");
+                    GUI.UpdateLog(SECCONFORM.LoggingType.Error, "Overwriting the target database failed. Maybe it's in use by another process or it is write protected.");
                     return;
                 }
             }
             //END SYNCHRONIZE
 
             //Save current database
-            if (!this.savedatabase())
+            if (!savedatabase())
             {
-                GUI.updateLog(4, "Saving the current database failed - the target database is keeping untouched.");
+                GUI.UpdateLog(SECCONFORM.LoggingType.Error, "Saving the current database failed - the target database is keeping untouched.");
                 return;
             }
 
@@ -1266,17 +1266,17 @@ namespace SEC2ON.LBSecconBusinessLogic
             }
             catch
             {
-                GUI.updateLog(4, "Updating the target database failed - the target database is keeping untouched.");
+                GUI.UpdateLog(SECCONFORM.LoggingType.Error, "Updating the target database failed - the target database is keeping untouched.");
             }
 
             //refresh the listview
             m_groups.Clear();
 
             //Report if there were updated items
-            if (updated == 0 && updatedpgp == 0) GUI.updateLog(2, string.Format("The local database is up to date.", updated, updatedpgp));
-            if (updated > 0 && updatedpgp == 0) GUI.updateLog(2, string.Format("Updated items: {0}", updated, updatedpgp));
-            if (updated == 0 && updatedpgp > 0) GUI.updateLog(2, string.Format("Updated PGP-Keys: {1}", updated, updatedpgp));
-            if (updated > 0 && updatedpgp > 0) GUI.updateLog(2, string.Format("Updated items: {0}, updated PGP-Keys: {1}", updated, updatedpgp));
+            if (updated == 0 && updatedpgp == 0) GUI.UpdateLog(SECCONFORM.LoggingType.Info, string.Format("The local database is up to date.", updated, updatedpgp));
+            if (updated > 0 && updatedpgp == 0) GUI.UpdateLog(SECCONFORM.LoggingType.Info, string.Format("Updated items: {0}", updated, updatedpgp));
+            if (updated == 0 && updatedpgp > 0) GUI.UpdateLog(SECCONFORM.LoggingType.Info, string.Format("Updated PGP-Keys: {1}", updated, updatedpgp));
+            if (updated > 0 && updatedpgp > 0) GUI.UpdateLog(SECCONFORM.LoggingType.Info, string.Format("Updated items: {0}, updated PGP-Keys: {1}", updated, updatedpgp));
 
             return;
         }
@@ -1317,7 +1317,7 @@ namespace SEC2ON.LBSecconBusinessLogic
 
                 if (invaliddb == DialogResult.Cancel)
                 {
-                    GUI.updateLog(4, "The target database cannot be opened. Maybe the password is different to the current database or the file is corrupt.");
+                    GUI.UpdateLog(SECCONFORM.LoggingType.Error, "The target database cannot be opened. Maybe the password is different to the current database or the file is corrupt.");
                     return SynchronizeDatabasesResult.Cancelled;
                 }
                 else
@@ -1357,14 +1357,14 @@ namespace SEC2ON.LBSecconBusinessLogic
 
                             if (!onlineitem.GetDeletedFlag())
                             {
-                                GUI.updateLog(5, string.Format("SYNCHRONIZE: {0} has been updated - Timestamp: Source {1}, Target {2}",
+                                GUI.UpdateLog(SECCONFORM.LoggingType.Synchronize, string.Format("SYNCHRONIZE: {0} has been updated - Timestamp: Source {1}, Target {2}",
                                     onlineitem.Name,
                                     localitem.Latest,
                                     onlineitem.Latest), logonly: true);
                             }
                             else if (onlineitem.GetDeletedFlag())
                             {
-                                GUI.updateLog(5, string.Format("SYNCHRONIZE: {0} has been deleted - Timestamp: Source {1}, Target {2}",
+                                GUI.UpdateLog(SECCONFORM.LoggingType.Synchronize, string.Format("SYNCHRONIZE: {0} has been deleted - Timestamp: Source {1}, Target {2}",
                                     onlineitem.Name,
                                     localitem.Latest,
                                     onlineitem.Latest), logonly: true);
@@ -1376,7 +1376,7 @@ namespace SEC2ON.LBSecconBusinessLogic
                         {
                             if (!onlineitem.GetDeletedFlag())
                             {
-                                //this.updateLog(-1, string.Format("Merge: {0} has not been updated - Timestamp: Source {1}, Target {2}",
+                                //updateLog(-1, string.Format("Merge: {0} has not been updated - Timestamp: Source {1}, Target {2}",
                                 //    onlineitem.GetAttributeNode("name").Value,
                                 //    localitem.SelectSingleNode("latest").InnerText,
                                 //    onlineitem.SelectSingleNode("latest").InnerText), logonly: true);
@@ -1394,7 +1394,7 @@ namespace SEC2ON.LBSecconBusinessLogic
                     //give a message and count when a non-deleted item was added only
                     if (!onlineitem.GetDeletedFlag())
                     {
-                        GUI.updateLog(5, string.Format("SYNCHRONIZE: {0} has been added.",
+                        GUI.UpdateLog(SECCONFORM.LoggingType.Synchronize, string.Format("SYNCHRONIZE: {0} has been added.",
                         onlineitem.Name));
                         updated++;
                     }
@@ -1457,7 +1457,7 @@ namespace SEC2ON.LBSecconBusinessLogic
                                 if (searchforseconditem == 2)
                                 {
                                     noredundantitemfound = false;
-                                    GUI.updateLog(5, string.Format("Redundant group definition deleted: {0}", DBEntries[i2].Group), true);
+                                    GUI.UpdateLog(SECCONFORM.LoggingType.Synchronize, string.Format("Redundant group definition deleted: {0}", DBEntries[i2].Group), true);
                                     DBEntries.RemoveAt(i2);
 
                                     break;
@@ -1479,15 +1479,15 @@ namespace SEC2ON.LBSecconBusinessLogic
         }
 
         //Import Items
-        public void importItems(MemoryStream input, String group, ImageList imageList2, Boolean fromclipboard)
+        public void importItems(MemoryStream input, String group, ImageList imageList2, bool fromclipboard)
         {
-            this.importItems(input, group, imageList2, "clipboard content", true);
+            importItems(input, group, imageList2, "clipboard content", true);
         }
         public void importItems(MemoryStream input, String group, ImageList imageList2, String file)
         {
-            this.importItems(input, group, imageList2, file, false);
+            importItems(input, group, imageList2, file, false);
         }
-        public void importItems(MemoryStream input, String group, ImageList imageList2, String file, Boolean fromclipboard)
+        public void importItems(MemoryStream input, String group, ImageList imageList2, String file, bool fromclipboard)
         {
             byte[] importsource = null;
             try //try to decrypt with the database's password, when not possible ask for password to decrypt
@@ -1513,7 +1513,7 @@ namespace SEC2ON.LBSecconBusinessLogic
                 }
                 catch
                 {
-                    GUI.updateLog(4, string.Format("Decryption of \"" + file + "\" failed. Maybe wrong password was given."));
+                    GUI.UpdateLog(SECCONFORM.LoggingType.Error, string.Format("Decryption of \"" + file + "\" failed. Maybe wrong password was given."));
                     return;
                 }
             }
@@ -1607,7 +1607,7 @@ namespace SEC2ON.LBSecconBusinessLogic
 
                         newentry.LastModification = Convert.ToDateTime(lastmodified).ToUniversalTime();
 
-                        this.addItem(newentry, SecItem.ItemType.Item, DBEntries, imageList2, suppresseditdialog: true);
+                        addItem(newentry, SecItem.ItemType.Item, DBEntries, imageList2, suppresseditdialog: true);
 
                         importcount++;
 
@@ -1627,12 +1627,12 @@ namespace SEC2ON.LBSecconBusinessLogic
             //Show result message
             if (errcount == 0)
             {
-                if (importcount == 1) GUI.updateLog(2, string.Format("{0} Item has been imported succesfully.", importcount));
-                else GUI.updateLog(2, string.Format("{0} Items have been imported succesfully.", importcount));                
+                if (importcount == 1) GUI.UpdateLog(SECCONFORM.LoggingType.Info, string.Format("{0} Item has been imported succesfully.", importcount));
+                else GUI.UpdateLog(SECCONFORM.LoggingType.Info, string.Format("{0} Items have been imported succesfully.", importcount));                
             }
             else
             {
-                GUI.updateLog(4, string.Format("{0} Item(s) have been imported. {1} Item(s) were faulty and importing was impossible.", importcount, errcount));
+                GUI.UpdateLog(SECCONFORM.LoggingType.Error, string.Format("{0} Item(s) have been imported. {1} Item(s) were faulty and importing was impossible.", importcount, errcount));
             }
         }
 
@@ -1645,17 +1645,17 @@ namespace SEC2ON.LBSecconBusinessLogic
                 {
                     if (delete) //delete item(s)
                     {
-                        if (!this.UnlockDB(check: true)) return;
+                        if (!UnlockDB(check: true)) return;
 
                         DBGroups[index].DeleteItem();                                                
 
-                        GUI.updateLog(2, string.Format("Group definition \"{0}\" has been deleted.", groupname));
+                        GUI.UpdateLog(SECCONFORM.LoggingType.Info, string.Format("Group definition \"{0}\" has been deleted.", groupname));
 
                         WatchChangesDB.Changed = true;
                     }
                     else
                     {
-                        if (!this.UnlockDB(check: true)) return;
+                        if (!UnlockDB(check: true)) return;
 
                         //open the edit entry dialog
                         Editentry edititem = new Editentry();
@@ -1676,7 +1676,7 @@ namespace SEC2ON.LBSecconBusinessLogic
 
             m_groups.Clear();            
 
-            this.RenumberGroupPosition();
+            RenumberGroupPosition();
 
 
         }
@@ -1725,7 +1725,7 @@ namespace SEC2ON.LBSecconBusinessLogic
 
             
 
-            this.RenumberGroupPosition();
+            RenumberGroupPosition();
         }
 
         //renumbering of groupposition

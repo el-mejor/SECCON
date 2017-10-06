@@ -5,11 +5,20 @@
     <Setting Name="dropboxAppKey" Type="System.String" Scope="User">
       <Value Profile="(Default)">j93h8yfahdiudog</Value>
     </Setting>
-    <Setting Name="dropboxAppSecret" Type="System.String" Scope="User">
-      <Value Profile="(Default)">replaceWithYourCredentials</Value>
-    </Setting>
     <Setting Name="dropboxRedirectUrl" Type="System.String" Scope="User">
       <Value Profile="(Default)">https://localhost/authorize</Value>
+    </Setting>
+    <Setting Name="ExtensionBackup" Type="System.String" Scope="User">
+      <Value Profile="(Default)">.sdb_backup</Value>
+    </Setting>
+    <Setting Name="TempDBFile" Type="System.String" Scope="User">
+      <Value Profile="(Default)">~synctemp.tmp</Value>
+    </Setting>
+    <Setting Name="timeToDeleteClipboardSeconds" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">10</Value>
+    </Setting>
+    <Setting Name="timeOutPasswordHandler" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">180000</Value>
     </Setting>
   </Settings>
 </SettingsFile>

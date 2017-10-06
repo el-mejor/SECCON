@@ -8,10 +8,9 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SEC2ON.Properties
-{
-
-
+namespace SEC2ON.Properties {
+    
+    
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "14.0.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
@@ -38,18 +37,6 @@ namespace SEC2ON.Properties
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("replaceWithYourCredentials")]
-        public string dropboxAppSecret {
-            get {
-                return ((string)(this["dropboxAppSecret"]));
-            }
-            set {
-                this["dropboxAppSecret"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("https://localhost/authorize")]
         public string dropboxRedirectUrl {
             get {
@@ -57,6 +44,54 @@ namespace SEC2ON.Properties
             }
             set {
                 this["dropboxRedirectUrl"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(".sdb_backup")]
+        public string ExtensionBackup {
+            get {
+                return ((string)(this["ExtensionBackup"]));
+            }
+            set {
+                this["ExtensionBackup"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("~synctemp.tmp")]
+        public string TempDBFile {
+            get {
+                return ((string)(this["TempDBFile"]));
+            }
+            set {
+                this["TempDBFile"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        public int timeToDeleteClipboardSeconds {
+            get {
+                return ((int)(this["timeToDeleteClipboardSeconds"]));
+            }
+            set {
+                this["timeToDeleteClipboardSeconds"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("180000")]
+        public int timeOutPasswordHandler {
+            get {
+                return ((int)(this["timeOutPasswordHandler"]));
+            }
+            set {
+                this["timeOutPasswordHandler"] = value;
             }
         }
     }

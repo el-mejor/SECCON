@@ -60,7 +60,7 @@ namespace SEC2ON.LBSecconBusinessLogic.Classes
             m_lastmodified = LastModification;
             m_size = Size; 
             if (Path.GetExtension(m_name) == ".sdb") m_type = FileType.Database;
-            else if (Path.GetExtension(m_name) == Properties.Resources.ExtensionBackup) m_type = FileType.DatabaseBackup;
+            else if (Path.GetExtension(m_name) == Properties.Settings.Default.ExtensionBackup) m_type = FileType.DatabaseBackup;
             else m_type = FileType.Unknown;
         }
     }
