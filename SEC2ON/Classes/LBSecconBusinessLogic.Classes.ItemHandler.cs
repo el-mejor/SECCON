@@ -1,9 +1,4 @@
-﻿using LBPasswordAndCryptoServices;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Windows.Forms;
+﻿using System;
 using System.Xml;
 
 namespace SEC2ON.LBSecconBusinessLogic.Classes

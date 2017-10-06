@@ -1,6 +1,4 @@
-﻿using Dropbox.Api;
-using Dropbox.Api.Files;
-using LBPasswordAndCryptoServices;
+﻿using LBPasswordAndCryptoServices;
 using SEC2ON.LBSecconBusinessLogic.Classes;
 using SEC2ON.LBSecconBusinessLogic.Dialogs;
 using System;
@@ -9,13 +7,10 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml;
-using System.Threading.Tasks;
 
 namespace SEC2ON.LBSecconBusinessLogic
 {

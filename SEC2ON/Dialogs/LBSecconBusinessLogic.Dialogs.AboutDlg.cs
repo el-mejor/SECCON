@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Windows.Forms;
 using System.Reflection;
+using System.Windows.Forms;
 
 namespace SEC2ON.LBSecconBusinessLogic.Dialogs
 {
