@@ -14,12 +14,13 @@ using System.Windows.Forms;
 
 namespace SEC2ON
 {
-    public partial class SECCONFORM : Form
+    public sealed partial class SECCONFORM : Form
     {
         #region fields
         private dayscale scale = new dayscale();
         private SecconBL secconbl = new SecconBL();
         private sortingOrderItems m_sorting = sortingOrderItems.AscName;
+        private Timer m_delayUIactionsTimer;
         #endregion
 
         #region properties
@@ -102,7 +103,7 @@ namespace SEC2ON
         }
         #endregion
 
-        #region GUIFucntions and BL Forwarding  
+        #region GUIFunctions and BL Forwarding  
         //Show the items in the listview - sort it into groups and only display items of the selected group
         //filter items if the search group is selected
         public enum sortingOrderItems { AscName, AscGroup, AscLastModification, DesName, DesGroup, DesLastModification };
@@ -392,11 +393,6 @@ namespace SEC2ON
         }
 
         //Logging and Statusbar update
-        [Obsolete]
-        public void UpdateLog(int imageindex, string text, bool logonly = false)
-        {
-            UpdateLog(imageindex, text, logonly, Color.Black, listViewLog.BackColor);
-        }
         public void UpdateLog(LoggingType loggingtype, string text, bool logonly = false)
         {
             UpdateLog(loggingtype, text, logonly, Color.Black, listViewLog.BackColor);
@@ -408,27 +404,7 @@ namespace SEC2ON
         public void updateLog(LoggingType loggingtype, string text, Color TextColor, Color BackColor)
         {
             UpdateLog(loggingtype, text, true, TextColor, BackColor);
-        }
-        [Obsolete]
-        public void UpdateLog(int imageindex, string text, bool logonly, Color TextColor, Color BackColor)
-        {
-            if (!logonly)
-            {
-                toolStripOwner.Text = text;
-                toolStripOwner.Image = imageListToolStrip.Images[imageindex];
-            }
-
-            listViewLog.Items.Add(DateTime.Now.ToString());
-            if (imageindex >= 0) listViewLog.Items[listViewLog.Items.Count - 1].ImageIndex = imageindex;
-
-            listViewLog.Items[listViewLog.Items.Count - 1].SubItems.Add(text);
-            listViewLog.Items[listViewLog.Items.Count - 1].ForeColor = TextColor;
-            listViewLog.Items[listViewLog.Items.Count - 1].BackColor = BackColor;
-
-            listViewLog.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-
-            listViewLog.Items[listViewLog.Items.Count - 1].EnsureVisible();
-        }
+        }        
         public void UpdateLog(LoggingType loggingtype, string text, bool logonly, Color TextColor, Color BackColor)
         {
             if (!logonly)
@@ -570,6 +546,27 @@ namespace SEC2ON
             toolStrip2.Enabled = !lockws;
             listViewAccounts.Enabled = !lockws;
             listViewGroups.Enabled = !lockws;
+        }
+
+        //Get the delayed UI Action timer
+        private Timer getDelayTimer()
+        {
+            if (m_delayUIactionsTimer == null)
+            {
+                m_delayUIactionsTimer = new Timer();
+                m_delayUIactionsTimer.Tick += new EventHandler(stopDelayTimer);
+            }
+
+            m_delayUIactionsTimer.Start();
+            m_delayUIactionsTimer.Interval = 1000;
+
+            return m_delayUIactionsTimer;
+        }
+
+        //stop the ui timer after a tick was fired
+        private void stopDelayTimer(object sender, EventArgs e)
+        {
+            getDelayTimer().Stop();
         }
         #endregion
 
@@ -951,10 +948,23 @@ namespace SEC2ON
 
             if (Sender.Name == listViewAccounts.Name) contextMenuEnableItems(SelectedItemType.Item);
             if (Sender.Name == listViewGroups.Name) contextMenuEnableItems(SelectedItemType.Group);
+        }        
+
+        //Search text box selection
+        private void toolStripSearch_Click(object sender, EventArgs e)
+        {
+            if (toolStripSearch.Text == "Search...") toolStripSearch.SelectAll();
         }
 
         //refresh list with new search string, handle watermark text
         private void toolStripSearch_TextChanged(object sender, EventArgs e)
+        {
+            getDelayTimer().Tick -= new EventHandler(doDelayedUIAction_toolStripSearch_TextChanged);
+            getDelayTimer().Tick += new EventHandler(doDelayedUIAction_toolStripSearch_TextChanged);
+        }
+
+        //perform: refresh list with new search string, handle watermark text
+        private void doDelayedUIAction_toolStripSearch_TextChanged(object sender, EventArgs e)
         {
             if (toolStripSearch.Text == "Search...") return;
             if (toolStripSearch.Text.Contains("Search...")) toolStripSearch.Text = toolStripSearch.Text.Replace("Search...", "");
@@ -967,15 +977,9 @@ namespace SEC2ON
             else toolStripSearch.ForeColor = Color.Black;
 
             //select the search results if it is not selected
-            if(!listViewGroups.Items[2].Selected) listViewGroups.Items[2].Selected = true;
-            
-            showlist(listViewGroups.Items[2].Text);
-        }
+            if (!listViewGroups.Items[2].Selected) listViewGroups.Items[2].Selected = true;
 
-        //Search text box selection
-        private void toolStripSearch_Click(object sender, EventArgs e)
-        {
-            if (toolStripSearch.Text == "Search...") toolStripSearch.SelectAll();
+            showlist(listViewGroups.Items[2].Text);
         }
 
         //define a new master key for the database
@@ -1722,18 +1726,7 @@ namespace SEC2ON
             {
                 toolStripProgressBar1.Value = secconbl.Killclipboardtimerexpired;
             }
-        }
-
-
-
-
-
-
-
-
-
-        #endregion
-
-        
+        }        
+        #endregion        
     }
 }
