@@ -182,7 +182,7 @@ namespace SEC2ON.LBSecconBusinessLogic.Dialogs
         {
             OpenFileDialog opendbname = new OpenFileDialog();
             opendbname.AddExtension = true;
-            opendbname.Filter = "Open PGP Keyfile (*.asc)|*.asc|All files (*.*)|*.*";
+            opendbname.Filter = "Open PGP Keyfile (*.asc)|*.asc|Open PGP Keyfile (*.pgp)|*.pgp|All files (*.*)|*.*";
             opendbname.DefaultExt = "asc";
 
             if (opendbname.ShowDialog() != DialogResult.OK) return;
