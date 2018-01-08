@@ -344,6 +344,11 @@ namespace LBPasswordAndCryptoServices
         //encrypt the input stream by using PGP
         public static void PGPencrypt(String m_input, String keystring, string targetfile)
         {
+            if (string.IsNullOrEmpty(keystring))
+            {
+                throw new Exception("No key was given.");                
+            }
+
             using (StreamWriter x = new StreamWriter(targetfile))
             {
                 x.Write(Environment.NewLine);
@@ -357,11 +362,19 @@ namespace LBPasswordAndCryptoServices
             MemoryStream keyIn = new MemoryStream(ASCIIEncoding.UTF8.GetBytes(keystring));
             using (Stream inputStream = PgpUtilities.GetDecoderStream(keyIn))
             {
-                PgpPublicKeyRingBundle publicKeyRingBundle = new PgpPublicKeyRingBundle(inputStream);
-                foreach (PgpPublicKeyRing kRing in publicKeyRingBundle.GetKeyRings())
+                PgpPublicKeyRing bla = new PgpPublicKeyRing(inputStream);
+                //PgpPublicKeyRingBundle publicKeyRingBundle = new PgpPublicKeyRingBundle(inputStream);                
+
+                var x = bla.GetPublicKeys();
+                //var x = publicKeyRingBundle.GetKeyRings();                
+
+                foreach (PgpPublicKey kRing in x)
                 {
-                    key = kRing.GetPublicKey();
-                    if (key != null) break;
+                    if (kRing.IsEncryptionKey & !kRing.IsMasterKey & !kRing.IsRevoked())
+                    {
+                        key = kRing;
+                        break; 
+                    }
                 }
             }
 
